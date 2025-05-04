@@ -34,11 +34,11 @@ class TagListSection(QWidget):
     def _setup_ui(self):
         """Sets up the title, button, scroll area, and layout."""
         # Créer les widgets principaux
-        self.tag_list_title = QLabel("Tag List")
+        self.tag_list_title = QLabel("Tags")
         self.tag_list_title.setObjectName("tag_list_title")
 
         self.add_tag_button = ActionButton(
-            text="Add Tag", icon_path="src/ui/assets/icons/add.svg"
+            text="Ajouter un tag", icon_path="src/ui/assets/icons/add.svg"
         )
         self.add_tag_button.setObjectName("add_tag_button")
         self.add_tag_button.clicked.connect(events.add_tag_clicked.emit)
@@ -81,7 +81,7 @@ class TagListSection(QWidget):
         # Add new tag widgets
         tags = self.tag_manager.get_tags()
         if not tags:
-            tag_label = QLabel("No Tags Available")
+            tag_label = QLabel("Aucun tag")
             tag_label.setObjectName("tag_item_label")
             self.tags_layout.addWidget(tag_label)
         else:

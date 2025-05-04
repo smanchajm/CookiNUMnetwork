@@ -25,7 +25,7 @@ class MediaPlayer(QFrame):
         self.controls = MediaControls()
 
         # Add recording indicator overlay
-        self.recording_indicator = QLabel("Recording", self.video_frame)
+        self.recording_indicator = QLabel("Enregistrement", self.video_frame)
         self.recording_indicator.setObjectName("recording_indicator")
         self.recording_indicator.setVisible(False)
         self.recording_indicator.setAlignment(

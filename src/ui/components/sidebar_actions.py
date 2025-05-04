@@ -16,13 +16,13 @@ class ActionButtonsSection(QWidget):
 
         self.mode_buttons_data = [
             (
-                "Live Mode",
+                "Mode Direct",
                 "live_mode_btn",
                 constants.icons_path + "/camera_video.svg",
                 events.live_mode_clicked,
             ),
             (
-                "Review Mode",
+                "Mode Replay",
                 "review_mode_btn",
                 constants.icons_path + "/movie.svg",
                 events.review_mode_clicked,
@@ -31,25 +31,25 @@ class ActionButtonsSection(QWidget):
 
         self.action_buttons_data = [
             (
-                "Open video",
+                "Ouvrir une vidéo",
                 "open_video_btn",
                 "src/ui/assets/icons/folder_open.svg",
                 events.open_video_clicked,
             ),
             (
-                "Start recording",
+                "Enregistrer",
                 "start_recording_btn",
                 "src/ui/assets/icons/radio_button_checked.svg",
                 events.start_recording_clicked,
             ),
             (
-                "Connect GoPro",
+                "Connexion GoPro",
                 "connect_gopro_btn",
                 "src/ui/assets/icons/qr_code_scanner.svg",
                 events.connect_gopro_clicked,
             ),
             (
-                "WiFi Connection",
+                "Connexion WiFi",
                 "connect_wifi_btn",
                 "src/ui/assets/icons/wifi.svg",
                 events.connect_wifi_clicked,

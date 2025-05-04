@@ -1,12 +1,11 @@
 import time
 
 from PyQt6.QtWidgets import QWidget, QLabel, QSlider, QStyle, QStyleOptionSlider
-from PyQt6.QtCore import Qt, QRect, QPoint
-from PyQt6.QtGui import QIcon, QPainter, QColor, QPixmap
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QIcon, QPainter
 
 from src.ui.widgets.action_button import ActionButton
 from src.ui.utils.layouts import create_vbox_layout, create_hbox_layout
-from src.ui.utils.qt_helpers import clear_layout, set_margins
 from src.core.event_handler import events
 
 
