@@ -2,6 +2,7 @@ from PyQt6.QtCore import QObject, QTimer
 from PyQt6.QtWidgets import QFileDialog
 import os
 
+from src.core.constants import video_files_path
 from src.core.video_processing.player import Player
 from src.core.event_handler import events
 
@@ -25,20 +26,26 @@ class MediaService(QObject):
 
         events.media_loaded.connect(self.load_media)
 
-    def open_video_file(self, parent_widget=None):
+    def open_video_file(self, parent_widget=None, start_dir=video_files_path):
         """
         Ouvre une boîte de dialogue pour sélectionner un fichier vidéo.
 
         Args:
             parent_widget: Widget parent pour la boîte de dialogue
+            start_dir: Dossier de départ pour le file explorer (par défaut: dossier personnel)
 
         Returns:
             str: Chemin du fichier sélectionné ou None si l'utilisateur a annulé
         """
+        if start_dir is None:
+            start_dir = os.path.expanduser("~")
+        elif not os.path.exists(start_dir):
+            start_dir = os.path.expanduser("~")
+
         file_path, _ = QFileDialog.getOpenFileName(
             parent_widget,
             "Ouvrir une vidéo",
-            os.path.expanduser("~"),
+            start_dir,
             "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov);;Tous les fichiers (*.*)",
         )
 

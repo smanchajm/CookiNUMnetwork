@@ -12,3 +12,6 @@ icons_path = os.path.join(root_path, "ui", "assets", "icons")
 
 # Assets path
 assets_path = os.path.join(root_path, "ui", "assets")
+
+# Video files path
+video_files_path = os.path.join(root_path, "storage", "video_files")

@@ -45,6 +45,14 @@ Thumbs.db
 *.swp
 *.~lock.*
 
+# video files
+*.mp4
+*.avi
+*.mkv
+*.mov
+*.wmv
+
+
 # Old version
 old_CookiNUMnetwork
 temp
