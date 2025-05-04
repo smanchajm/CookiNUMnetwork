@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout
 
 from src.core import constants
 from src.core.event_handler import events
+from src.core.video_processing.mode_service import Mode
 from src.ui.utils.layouts import create_vbox_layout
 from src.ui.widgets.action_button import ActionButton
 from src.ui.widgets.separator import Separator
@@ -72,34 +73,35 @@ class ActionButtonsSection(QWidget):
         # Initialiser l'état des boutons (mode review par défaut)
         self.on_live_mode_changed(False)
 
-    def on_live_mode_changed(self, is_live_mode):
-        """Handle visibility state changes."""
-        for button in self.live_mode_buttons:
-            self.buttons[button].setVisible(is_live_mode)
-        for button in self.review_mode_buttons:
-            self.buttons[button].setVisible(not is_live_mode)
-
     def _setup_ui(self):
         """Creates the buttons and layout."""
         for text, name, icon_path, signal in self.mode_buttons_data:
-            button = ActionButton(text=text, icon_path=icon_path)
+            button = ActionButton(
+                text=text, icon_path=icon_path, css_class="mode_button"
+            )
             button.setObjectName(name)
             button.clicked.connect(signal.emit)
             self.buttons[name] = button
 
+            # Initialiser la propriété active
+            if name == "live_mode_btn":
+                button.setProperty("active", "false")
+            elif name == "review_mode_btn":
+                button.setProperty("active", "true")
+
         self.buttons["separator_mode_section"] = Separator()
 
         for text, name, icon_path, signal in self.action_buttons_data:
-            button = ActionButton(text=text, icon_path=icon_path)
+            button = ActionButton(
+                text=text, icon_path=icon_path, css_class="action_button"
+            )
             button.setObjectName(name)
             button.clicked.connect(signal.emit)
             self.buttons[name] = button
 
         self.buttons["separator_tag_section"] = Separator()
 
-        self.layout = create_vbox_layout(
-            widgets=list(self.buttons.values()), spacing=0, margins=(0, 0, 0, 0)
-        )
+        self.layout = create_vbox_layout(widgets=list(self.buttons.values()))
         self.setLayout(self.layout)
 
         # Calculer la largeur maximale
@@ -109,10 +111,38 @@ class ActionButtonsSection(QWidget):
         for button in self.buttons.values():
             button.setFixedWidth(max_width)
 
-    def update_recording_state(self, is_recording):
-        """Update recording button appearance based on recording state."""
+    def update_recording_state(self, is_recording: bool) -> None:
+        """
+        Met à jour l'apparence du bouton d'enregistrement en fonction de l'état.
+        """
         button = self.buttons["start_recording_btn"]
         if is_recording:
             button.setText("Stop recording")
         else:
             button.setText("Start recording")
+
+    def on_live_mode_changed(self, is_live_mode: bool) -> None:
+        """
+        Gère les changements de visibilité des boutons en fonction du mode.
+        """
+        # Mettre à jour la visibilité des boutons
+        for button in self.live_mode_buttons:
+            self.buttons[button].setVisible(is_live_mode)
+        for button in self.review_mode_buttons:
+            self.buttons[button].setVisible(not is_live_mode)
+
+        # Mettre à jour l'état actif des boutons de mode
+        self.buttons["live_mode_btn"].setProperty(
+            "active", "true" if is_live_mode else "false"
+        )
+        self.buttons["review_mode_btn"].setProperty(
+            "active", "true" if not is_live_mode else "false"
+        )
+
+        # Forcer la mise à jour du style
+        self.buttons["live_mode_btn"].style().unpolish(self.buttons["live_mode_btn"])
+        self.buttons["live_mode_btn"].style().polish(self.buttons["live_mode_btn"])
+        self.buttons["review_mode_btn"].style().unpolish(
+            self.buttons["review_mode_btn"]
+        )
+        self.buttons["review_mode_btn"].style().polish(self.buttons["review_mode_btn"])

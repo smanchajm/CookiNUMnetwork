@@ -1,88 +1,92 @@
-from PyQt6.QtWidgets import QFrame, QLabel
-from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QFrame
 
 from src.core.video_processing.media_service import MediaService
-from src.ui.components.media_controls import MediaControls
+from src.core.video_processing.mode_service import Mode
+from src.ui.components.media_live_section import MediaLiveSection
+from src.ui.components.media_replay_section import MediaReplaySection
 from src.ui.utils.layouts import create_vbox_layout
 
 
 class MediaPlayer(QFrame):
     """
     Widget lecteur média avec contrôles personnalisés.
+    Gère l'affichage des sections live et replay.
     """
 
     def __init__(self, media_service: MediaService, parent=None):
         super().__init__(parent)
         self.setObjectName("media_player")
-        self.is_live_mode = False
         self.media_service = media_service
 
         self.setup_ui()
 
     def setup_ui(self):
-        self.video_frame = QFrame()
-        self.video_frame.setObjectName("video_frame")
-        self.controls = MediaControls()
+        """Configure l'interface utilisateur du lecteur."""
+        # Créer les sections
+        self.live_section = MediaLiveSection()
+        self.replay_section = MediaReplaySection(self.media_service)
 
-        # Add recording indicator overlay
-        self.recording_indicator = QLabel("Enregistrement", self.video_frame)
-        self.recording_indicator.setObjectName("recording_indicator")
-        self.recording_indicator.setVisible(False)
-        self.recording_indicator.setAlignment(
-            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
-        )
-        self.recording_indicator.raise_()
-        # Créer le layout en utilisant la fonction helper
+        # Créer le layout principal
         main_layout = create_vbox_layout(
-            widgets=[self.video_frame, self.controls], spacing=0, margins=(0, 0, 0, 0)
+            widgets=[self.live_section, self.replay_section],
+            spacing=0,
+            margins=(0, 0, 0, 0),
         )
-
-        # Donner plus d'espace au frame vidéo
-        main_layout.setStretchFactor(self.video_frame, 1)
-
         self.setLayout(main_layout)
 
-        if self.video_frame.winId():  # Assurer que winId est valide
-            self.media_service.set_video_output(self.video_frame.winId())
+        # Initialiser l'affichage
+        self._update_display(False)  # Mode review par défaut
 
-    def on_play_state_changed(self, is_playing):
-        """
-        Met à jour l'interface en fonction de l'état de lecture.
-        """
-        if is_playing:
-            self.controls.play_pause_btn._setup_icon("src/ui/assets/icons/pause.svg")
-        else:
-            self.controls.play_pause_btn._setup_icon(
-                "src/ui/assets/icons/play_arrow.svg"
-            )
-        self.controls.is_playing = is_playing
+    def on_play_state_changed(self, is_playing: bool) -> None:
+        """Met à jour l'état de lecture dans la section replay."""
+        self.replay_section.on_play_state_changed(is_playing)
 
-    def on_position_changed(self, current_time, total_time):
-        """
-        Met à jour l'affichage de la timeline avec les temps actuels.
-        """
-        self.controls.update_timeline(current_time, total_time)
+    def on_position_changed(self, current_time: float, total_time: float) -> None:
+        """Met à jour la position dans la section replay."""
+        self.replay_section.on_position_changed(current_time, total_time)
 
-        # Mise à jour de la position du slider
-        if total_time > 0:
-            position_percent = (current_time / total_time) * 100
-            self.controls.update_slider_position(position_percent)
+    def on_mode_changed(self, is_live_mode: bool) -> None:
+        """
+        Met à jour l'affichage en fonction du mode.
 
-    def on_live_mode_changed(self, is_live_mode):
-        """Handle live mode state changes."""
-        self.is_live_mode = is_live_mode
+        Args:
+            is_live_mode: True si on passe en mode live, False pour le mode review.
+        """
+        self.media_service.reset_video()
+        self._update_display(is_live_mode)
+
+    def set_rtmp_connected(self, is_connected: bool) -> None:
+        """Update RTMP connection state."""
+        self.live_section.set_rtmp_connected(is_connected)
+
+    def _update_display(self, is_live_mode: bool) -> None:
+        """
+        Met à jour l'affichage en fonction du mode.
+
+        Args:
+            is_live_mode: True pour afficher la section live, False pour la section replay.
+        """
         if is_live_mode:
-            self.controls.hide()
+            self.live_section.show()
+            self.replay_section.hide()
         else:
-            self.controls.show()
+            self.live_section.hide()
+            self.replay_section.show()
 
-    def add_tag_icon(self, timestamp, total_time):
-        self.controls.on_add_tag(timestamp, total_time)
+    def add_tag_marker_at(self, timestamp: float) -> None:
+        """
+        Ajoute un marqueur de tag à la position spécifiée.
 
-    def set_recording_indicator(self, visible: bool):
+        Args:
+            timestamp: Le timestamp où ajouter le marqueur.
+        """
+        _, total_time = self.media_service.get_time()
+        self.replay_section.add_tag_icon(timestamp, total_time)
+
+    def set_recording_indicator(self, visible: bool) -> None:
         """Show or hide the recording indicator overlay."""
-        self.recording_indicator.setVisible(visible)
+        self.live_section.set_recording_indicator(visible)
 
-    def update_recording_state(self, is_recording: bool):
+    def update_recording_state(self, is_recording: bool) -> None:
         """Affiche ou masque l'indicateur d'enregistrement avec icône."""
         self.set_recording_indicator(is_recording)

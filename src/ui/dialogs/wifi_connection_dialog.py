@@ -74,7 +74,7 @@ class WiFiConnectionDialog(QDialog):
         layout.addWidget(self.instruction_label)
 
         # Bouton pour fermer
-        self.close_button = ActionButton("Fermer")
+        self.close_button = ActionButton("Fermer", css_class="secondary_button")
         self.close_button.clicked.connect(self.on_close_clicked)
         layout.addWidget(self.close_button)
 

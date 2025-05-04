@@ -21,3 +21,4 @@ class Separator(QFrame):
         """
         )
         self.setFixedHeight(1)
+        self.setContentsMargins(0, 0, 0, 8)

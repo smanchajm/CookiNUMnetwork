@@ -26,11 +26,6 @@ class TagListSection(QWidget):
 
         self._setup_ui()
 
-    def on_tags_changed(self, new_tags_data):
-        """Handle tags data changes."""
-        self.tag_manager.tags = new_tags_data
-        self.update_tag_display()
-
     def _setup_ui(self):
         """Sets up the title, button, scroll area, and layout."""
         # Créer les widgets principaux
@@ -71,6 +66,11 @@ class TagListSection(QWidget):
         main_layout.setStretchFactor(self.tag_scroll_area, 1)
 
         self.setLayout(main_layout)
+        self.update_tag_display()
+
+    def on_tags_changed(self, new_tags_data):
+        """Handle tags data changes."""
+        self.tag_manager.tags = new_tags_data
         self.update_tag_display()
 
     def update_tag_display(self):

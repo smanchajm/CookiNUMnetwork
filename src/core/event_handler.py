@@ -46,6 +46,9 @@ class EventHandler(QObject):
     add_tag_clicked = pyqtSignal()
     tag_selected = pyqtSignal(str)
 
+    # Mode transition signals
+    mode_changed = pyqtSignal(bool)  # bool: is_live_mode
+
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(EventHandler, cls).__new__(cls)

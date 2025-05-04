@@ -42,7 +42,7 @@ class GoProConnectionDialog(QDialog):
         self.qrcode_label.setMinimumSize(150, 150)
         layout.addWidget(self.qrcode_label)
 
-        self.cancel_button = ActionButton("Fermer")
+        self.cancel_button = ActionButton("Fermer", css_class="secondary_button")
         self.cancel_button.clicked.connect(self.on_cancel_clicked)
         layout.addWidget(self.cancel_button)
 

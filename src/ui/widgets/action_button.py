@@ -8,8 +8,19 @@ class ActionButton(QPushButton):
 
     DEFAULT_ICON_SIZE = QSize(20, 20)
 
-    def __init__(self, text: str = None, icon_path: str = None, parent=None):
+    def __init__(
+        self,
+        text: str = None,
+        icon_path: str = None,
+        css_class: str = None,
+        parent=None,
+    ):
         super().__init__(text, parent)
+        self._css_class = css_class
+
+        # Activer les propriétés nécessaires pour les états
+        self.setAttribute(Qt.WidgetAttribute.WA_Hover)
+        self.setMouseTracking(True)
 
         self._setup_icon(icon_path)
         self._setup_appearance()
@@ -24,6 +35,8 @@ class ActionButton(QPushButton):
     def _setup_appearance(self):
         """Sets common appearance properties."""
         self.setCursor(Qt.CursorShape.PointingHandCursor)
+        if self._css_class:
+            self.setProperty("class", self._css_class)
 
     def set_icon_size(self, width, height):
         """Set custom icon size and return self for method chaining."""

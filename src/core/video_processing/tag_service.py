@@ -4,6 +4,9 @@ Contient les classes et fonctions pour gérer les tags dans l'application.
 """
 
 import time
+from PyQt6.QtCore import pyqtSignal
+
+from src.core.event_handler import events
 
 
 class TagService:
@@ -30,6 +33,13 @@ class TagService:
         self.tags.append(tag)
         return tag
 
+    def create_and_add_tag(self, timestamp: float) -> tuple:
+        """
+        Crée et ajoute un nouveau tag à la position spécifiée.
+        """
+        new_tag_name = f"Tag {len(self.tags) + 1}"
+        return self.add_tag(new_tag_name, timestamp)
+
     def get_tags(self):
         return self.tags
 
@@ -37,4 +47,6 @@ class TagService:
         self.tags = tags
 
     def clear_tags(self):
+        """Réinitialise la liste des tags."""
         self.tags = []
+        events.tags_updated.emit(self.tags)

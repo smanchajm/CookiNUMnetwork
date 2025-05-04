@@ -145,3 +145,9 @@ class MediaService(QObject):
     def cleanup(self):
         self.timer.stop()
         self.player.cleanup()
+
+    def reset_video(self):
+        """Réinitialise la vidéo en cours."""
+        self.pause()
+        self.is_playing = False
+        events.play_state_changed.emit(self.is_playing)
