@@ -23,8 +23,15 @@ class ModeService:
     """
 
     def __init__(self):
-        self._mode = Mode.REVIEW
+        self._mode = Mode.LIVE
         self._transition_callbacks: List[Callable[[Mode, Mode], None]] = []
+
+    def initialize(self) -> None:
+        """
+        Initialise le service et notifie les observateurs du mode par défaut.
+        """
+        # Notifier les observateurs du mode initial
+        events.live_mode_changed.emit(self.is_live_mode)
 
     def set_mode(self, new_mode: Mode) -> None:
         """

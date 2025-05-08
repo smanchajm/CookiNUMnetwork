@@ -151,3 +151,8 @@ class MediaService(QObject):
         self.pause()
         self.is_playing = False
         events.play_state_changed.emit(self.is_playing)
+
+    def get_current_time(self):
+        """Retourne la position actuelle du lecteur."""
+        current_time, total_time = self.player.get_time()
+        return current_time, total_time

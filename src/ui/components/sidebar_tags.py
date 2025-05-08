@@ -20,10 +20,6 @@ class TagListSection(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("tag_section")
-
-        # Initialiser le gestionnaire de tags
-        self.tag_manager = TagService()
-
         self._setup_ui()
 
     def _setup_ui(self):
@@ -66,20 +62,16 @@ class TagListSection(QWidget):
         main_layout.setStretchFactor(self.tag_scroll_area, 1)
 
         self.setLayout(main_layout)
-        self.update_tag_display()
+        self.update_tag_display(None)
 
     def on_tags_changed(self, new_tags_data):
         """Handle tags data changes."""
-        self.tag_manager.tags = new_tags_data
-        self.update_tag_display()
+        self.update_tag_display(new_tags_data)
 
-    def update_tag_display(self):
+    def update_tag_display(self, tags: list[tuple[str, str, str]]):
         """Clears and repopulates the tag list display."""
         # Utiliser la fonction helper pour vider le layout
         clear_layout(self.tags_layout)
-
-        # Add new tag widgets
-        tags = self.tag_manager.get_tags()
         if not tags:
             tag_label = QLabel("Aucun tag")
             tag_label.setObjectName("tag_item_label")

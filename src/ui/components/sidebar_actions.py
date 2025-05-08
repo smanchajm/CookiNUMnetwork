@@ -70,9 +70,6 @@ class ActionButtonsSection(QWidget):
         self.buttons = {}
         self._setup_ui()
 
-        # Initialiser l'état des boutons (mode review par défaut)
-        self.on_live_mode_changed(False)
-
     def _setup_ui(self):
         """Creates the buttons and layout."""
         for text, name, icon_path, signal in self.mode_buttons_data:

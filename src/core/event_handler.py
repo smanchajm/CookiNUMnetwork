@@ -21,6 +21,12 @@ class EventHandler(QObject):
     connection_error = pyqtSignal(str)
     qrcode_created = pyqtSignal(str)
 
+    # Streaming signals
+    streaming_started = pyqtSignal()
+    streaming_stopped = pyqtSignal()
+    streaming_error = pyqtSignal(str)
+    streaming_status = pyqtSignal(str)
+
     # Media signals
     media_loaded = pyqtSignal(str)
     media_error = pyqtSignal(str)
@@ -48,6 +54,24 @@ class EventHandler(QObject):
 
     # Mode transition signals
     mode_changed = pyqtSignal(bool)  # bool: is_live_mode
+
+    # Media playback signals
+    media_playback_started = pyqtSignal()
+    media_playback_paused = pyqtSignal()
+    media_playback_stopped = pyqtSignal()
+    media_playback_error = pyqtSignal(str)
+
+    # Progression signals
+    progress_updated = pyqtSignal(float)  # Progress as percentage (0-100)
+    time_updated = pyqtSignal(int, int)  # (current position, total duration) in seconds
+
+    # Speed signals
+    speed_changed = pyqtSignal(float)  # New playback speed
+
+    # Recording signals
+    recording_started = pyqtSignal()
+    recording_stopped = pyqtSignal()
+    recording_error = pyqtSignal(str)
 
     def __new__(cls):
         if cls._instance is None:

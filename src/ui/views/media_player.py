@@ -9,8 +9,8 @@ from src.ui.utils.layouts import create_vbox_layout
 
 class MediaPlayer(QFrame):
     """
-    Widget lecteur média avec contrôles personnalisés.
-    Gère l'affichage des sections live et replay.
+    Media player widget with custom controls.
+    Manages display of live and replay sections.
     """
 
     def __init__(self, media_service: MediaService, parent=None):
@@ -21,12 +21,9 @@ class MediaPlayer(QFrame):
         self.setup_ui()
 
     def setup_ui(self):
-        """Configure l'interface utilisateur du lecteur."""
-        # Créer les sections
         self.live_section = MediaLiveSection()
         self.replay_section = MediaReplaySection(self.media_service)
 
-        # Créer le layout principal
         main_layout = create_vbox_layout(
             widgets=[self.live_section, self.replay_section],
             spacing=0,
@@ -34,37 +31,27 @@ class MediaPlayer(QFrame):
         )
         self.setLayout(main_layout)
 
-        # Initialiser l'affichage
-        self._update_display(False)  # Mode review par défaut
-
     def on_play_state_changed(self, is_playing: bool) -> None:
-        """Met à jour l'état de lecture dans la section replay."""
+        """Update playback state in the replay section."""
         self.replay_section.on_play_state_changed(is_playing)
 
     def on_position_changed(self, current_time: float, total_time: float) -> None:
-        """Met à jour la position dans la section replay."""
+        """Update position in the replay section."""
         self.replay_section.on_position_changed(current_time, total_time)
 
     def on_mode_changed(self, is_live_mode: bool) -> None:
         """
-        Met à jour l'affichage en fonction du mode.
-
-        Args:
-            is_live_mode: True si on passe en mode live, False pour le mode review.
+        Update display based on mode.
         """
-        self.media_service.reset_video()
-        self._update_display(is_live_mode)
+        self.update_display(is_live_mode)
 
     def set_rtmp_connected(self, is_connected: bool) -> None:
         """Update RTMP connection state."""
         self.live_section.set_rtmp_connected(is_connected)
 
-    def _update_display(self, is_live_mode: bool) -> None:
+    def update_display(self, is_live_mode: bool) -> None:
         """
-        Met à jour l'affichage en fonction du mode.
-
-        Args:
-            is_live_mode: True pour afficher la section live, False pour la section replay.
+        Update display based on mode.
         """
         if is_live_mode:
             self.live_section.show()
@@ -73,20 +60,20 @@ class MediaPlayer(QFrame):
             self.live_section.hide()
             self.replay_section.show()
 
-    def add_tag_marker_at(self, timestamp: float) -> None:
+    def add_tag_marker_at(self, current_time: float, total_time: float) -> None:
         """
-        Ajoute un marqueur de tag à la position spécifiée.
+        Add a tag marker at the specified position.
 
         Args:
-            timestamp: Le timestamp où ajouter le marqueur.
+            current_time: Timestamp where to add the marker.
+            total_time: Total video duration.
         """
-        _, total_time = self.media_service.get_time()
-        self.replay_section.add_tag_icon(timestamp, total_time)
+        self.replay_section.add_tag_icon(current_time, total_time)
 
     def set_recording_indicator(self, visible: bool) -> None:
         """Show or hide the recording indicator overlay."""
         self.live_section.set_recording_indicator(visible)
 
     def update_recording_state(self, is_recording: bool) -> None:
-        """Affiche ou masque l'indicateur d'enregistrement avec icône."""
+        """Show or hide the recording indicator with icon."""
         self.set_recording_indicator(is_recording)

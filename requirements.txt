@@ -6,7 +6,8 @@ qt_material==2.14
 
 # Video Processing
 opencv-python>=4.8.0
-python-vlc>=3.0.20000
+python-vlc>=3.0.18122
+av>=10.0.0
 
 # Voice Recognition
 vosk>=0.3.45
@@ -17,7 +18,7 @@ pypubsub>=4.0.3
 watchdog>=3.0.0
 
 # QR Code
-qrcode>=7.4.2
+qrcode>=7.3.1
 pillow>=10.0.0
 
 # Development Tools

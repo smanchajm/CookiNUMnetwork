@@ -10,31 +10,29 @@ from src.core.event_handler import events
 
 
 class ProgressSlider(QSlider):
-    """Slider personnalisé avec support pour les marqueurs de tags."""
+    """Custom slider with support for tag markers."""
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.tag_positions = []
-        # Charger l'icône SVG
         self.tag_icon = QIcon("src/ui/assets/icons/tag.svg")
         self.tag_icon_size = 20
-        # Créer un pixmap à partir de l'icône
         self.tag_pixmap = self.tag_icon.pixmap(self.tag_icon_size, self.tag_icon_size)
 
     def add_tag_marker(self, position_percent):
-        """Ajoute un marqueur de tag à la position spécifiée (0-1)."""
+        """Add a tag marker at the specified position (0-1)."""
         if position_percent >= 0 and position_percent <= 1:
             self.tag_positions.append(position_percent)
             self.update()
 
     def clear_tag_markers(self):
-        """Supprime tous les marqueurs de tags."""
+        """Remove all tag markers."""
         self.tag_positions.clear()
         self.update()
 
     def paintEvent(self, event):
         """
-        Dessine le slider avec les marqueurs de tags.
+        Draw the slider with tag markers.
         Called on update and init.
         """
         super().paintEvent(event)
@@ -42,7 +40,6 @@ class ProgressSlider(QSlider):
         if not self.tag_positions:
             return
 
-        # Obtenir les dimensions du slider
         opt = QStyleOptionSlider()
         self.initStyleOption(opt)
         groove_rect = self.style().subControlRect(
@@ -54,7 +51,6 @@ class ProgressSlider(QSlider):
 
         painter = QPainter(self)
 
-        # Définir la taille du marqueur
         half_marker = self.tag_icon_size // 2
         for position in self.tag_positions:
             x = groove_rect.x() + int(position * groove_rect.width())
@@ -76,7 +72,6 @@ class MediaControls(QWidget):
         self.setup_ui()
 
     def setup_ui(self):
-        # Créer les boutons de contrôle
         self.rewind_btn = ActionButton(
             icon_path="src/ui/assets/icons/skip_previous.svg",
         )
@@ -92,7 +87,6 @@ class MediaControls(QWidget):
 
         self.timeline_label = QLabel("00:00/00:00")
 
-        # Créer le slider de progression personnalisé
         self.progress_slider = ProgressSlider(Qt.Orientation.Horizontal)
         self.progress_slider.setRange(0, 100)
         self.progress_slider.setValue(0)
@@ -127,18 +121,14 @@ class MediaControls(QWidget):
         self.progress_slider.valueChanged.connect(self.on_slider_value_changed)
 
     def toggle_play(self):
-        """
-        Bascule l'état de lecture et met à jour l'interface
-        """
+        """Toggle playback state and update interface."""
         self.is_playing = not self.is_playing
 
-        # Met à jour l'icône
         if self.is_playing:
             self.play_pause_btn._setup_icon("src/ui/assets/icons/pause.svg")
         else:
             self.play_pause_btn._setup_icon("src/ui/assets/icons/play_arrow.svg")
 
-        # Émet le signal pour informer le lecteur
         events.play_pause_signal.emit(self.is_playing)
 
     def update_timeline(self, current_time, total_time):
@@ -147,31 +137,26 @@ class MediaControls(QWidget):
         self.timeline_label.setText(f"{current_formatted}/{total_formatted}")
 
     def update_slider_position(self, position_percent):
-        """
-        Met à jour la position du slider en pourcentage (0-100)
-        """
+        """Update slider position as percentage (0-100)."""
         self.is_programmatic_update = True
         self.progress_slider.setValue(int(position_percent))
         self.is_programmatic_update = False
 
     def on_slider_value_changed(self, value):
-        """
-        Appelé quand la valeur du slider change
-        value est entre 0 et 100
-        """
+        """Called when slider value changes (0-100)."""
         if self.is_programmatic_update:
             return
 
         print(f"[Controls] Slider value changed to {value}%")
-        events.seek_signal.emit(value / 100.0)  # Convertit en pourcentage (0-1)
+        events.seek_signal.emit(value / 100.0)  # Convert to percentage (0-1)
 
     def on_add_tag(self, timestamp, total_time):
         """
-        Ajoute un marqueur de tag sur le slider à la position spécifiée.
+        Add a tag marker on the slider at the specified position.
 
         Args:
-            timestamp (float): Position temporelle du tag en secondes
-            total_time (float): Durée totale de la vidéo en secondes
+            timestamp (float): Tag position in seconds
+            total_time (float): Total video duration in seconds
         """
         if total_time == 0 or timestamp > total_time:
             return
