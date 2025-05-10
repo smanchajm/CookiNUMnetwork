@@ -11,7 +11,8 @@ from src.core.video_processing.mode_service import ModeService, Mode
 from src.core.video_processing.player import VLCPlayer
 from src.core.video_processing.recording_service import RecordingService
 from src.core.video_processing.tag_service import TagService
-from src.ui.services.dialog_service import DialogService
+from src.core.streaming.streaming_service import StreamingService
+from src.ui.dialogs.dialog_service import DialogService
 from src.ui.utils.layouts import create_hbox_layout
 from src.ui.views.sidebar import Sidebar
 from src.ui.views.media_player import MediaPlayer
@@ -36,6 +37,7 @@ class MainWindow(QMainWindow):
         self.player = VLCPlayer()
         self.tag_manager = TagService()
         self.mode_manager = ModeService()
+        self.streaming_service = StreamingService()
         self.recording_service = RecordingService()
 
         # Initialize services
@@ -120,14 +122,14 @@ class MainWindow(QMainWindow):
 
         # Streaming connections
         events.streaming_started.connect(
-            self.media_player.media_live_section.on_streaming_started
+            self.media_player.live_section.on_streaming_started
         )
         events.streaming_stopped.connect(
-            self.media_player.media_live_section.on_streaming_stopped
+            self.media_player.live_section.on_streaming_stopped
         )
-        events.streaming_error.connect(
-            self.media_player.media_live_section.on_streaming_error
-        )
+        # events.streaming_error.connect(
+        #     self.media_player.live_section.on_streaming_error
+        # )
 
     def _setup_state_connections(self):
         """Configure connections for state changes."""
@@ -137,7 +139,7 @@ class MainWindow(QMainWindow):
         )
         events.live_mode_changed.connect(self.media_player.update_display)
 
-        # Recording state connections
+        # Recording state connections - only update UI
         events.recording_state_changed.connect(
             self.sidebar.action_section.update_recording_state
         )
@@ -172,3 +174,29 @@ class MainWindow(QMainWindow):
                 )
         except ValueError:
             self.dialog_service.show_error_message("Invalid timestamp format")
+
+    def closeEvent(self, event):
+        """
+        Handle application close event.
+        Ensures all resources are properly cleaned up.
+        """
+        print("Test: Application closing, cleaning up resources...")
+
+        # Clean up recording service
+        if hasattr(self, "recording_service"):
+            self.recording_service.cleanup()
+
+        # Clean up streaming service
+        if hasattr(self, "streaming_service"):
+            self.streaming_service.stop_mediamtx()
+
+        # Clean up media service
+        if hasattr(self, "media_service"):
+            self.media_service.cleanup()
+
+        # Clean up GoPro service
+        # if hasattr(self, "gopro_service"):
+        #     self.gopro_service.cleanup()
+
+        print("Test: Cleanup completed, closing application")
+        event.accept()

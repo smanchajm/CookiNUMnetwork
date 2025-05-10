@@ -1,5 +1,4 @@
 from PyQt6.QtWidgets import QFrame
-from PyQt6.QtCore import Qt
 
 from src.core.video_processing.media_service import MediaService
 from src.ui.components.media_controls import MediaControls

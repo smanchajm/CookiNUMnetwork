@@ -1,9 +1,11 @@
+import time
 from PyQt6.QtWidgets import QFrame, QLabel, QPushButton
 from PyQt6.QtCore import Qt
 import os
 
 from src.ui.utils.layouts import create_vbox_layout
 from src.core.video_processing.player import VLCPlayer
+from src.core.constants import streaming_rtsp_url
 
 
 class MediaLiveSection(QFrame):
@@ -19,6 +21,13 @@ class MediaLiveSection(QFrame):
 
         # Initialiser le lecteur VLC
         self.player = VLCPlayer()
+        self.player.options = [
+            "--rtsp-udp",
+            "--no-rtsp-tcp",
+            "--network-caching=50",  # 50 ms de buffer réseau
+            "--no-drop-late-frames",
+            "--no-skip-frames",
+        ]
 
         self.setup_ui()
 
@@ -46,29 +55,21 @@ class MediaLiveSection(QFrame):
         )
         self.instructions_label.raise_()
 
-        # Add test button
-        self.test_button = QPushButton("Test Streaming", self.video_frame)
-        self.test_button.setObjectName("test_button")
-        self.test_button.clicked.connect(self.on_test_streaming)
-        self.test_button.raise_()
-
         # Créer le layout
         main_layout = create_vbox_layout(
             widgets=[self.video_frame], spacing=0, margins=(0, 0, 0, 0)
         )
         self.setLayout(main_layout)
 
-    def on_test_streaming(self):
-        """Start streaming in test mode."""
-        self.on_streaming_started()
-
     def on_streaming_started(self):
         """Handle streaming start."""
+        print("on_streaming_started")
+        time.sleep(3)  # buffer
         self.is_rtmp_connected = True
         self._update_display()
 
-        # Configurer le lecteur pour lire le flux RTMP
-        self.player.load("rtmp://localhost:1935/live")
+        # Configurer le lecteur pour lire le flux rtsp (moins de latence)
+        self.player.load(streaming_rtsp_url)
         self.player.set_video_output(self.video_frame.winId())
         self.player.play()
 
@@ -81,11 +82,11 @@ class MediaLiveSection(QFrame):
     def _update_display(self):
         """Update display based on connection state."""
         self.instructions_label.setVisible(not self.is_rtmp_connected)
-        self.test_button.setVisible(not self.is_rtmp_connected)
 
     def set_recording_indicator(self, visible: bool):
         """Show or hide the recording indicator overlay."""
         self.recording_indicator.setVisible(visible)
+        self.recording_indicator.raise_()
 
     def resizeEvent(self, event):
         """Resize video widget when window is resized."""
