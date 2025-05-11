@@ -31,6 +31,7 @@ class ModeService:
         Initialise le service et notifie les observateurs du mode par défaut.
         """
         # Notifier les observateurs du mode initial
+        print(f"Test: ModeService initialized {self.is_live_mode}")
         events.live_mode_changed.emit(self.is_live_mode)
 
     def set_mode(self, new_mode: Mode) -> None:

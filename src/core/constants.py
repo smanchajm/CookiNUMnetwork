@@ -3,6 +3,7 @@ import socket
 
 src_path = os.path.dirname(os.path.dirname(__file__))
 fonts_path = os.path.join(src_path, "ui", "assets", "fonts")
+styles_path = os.path.join(src_path, "ui", "styles", "styles.qss")
 qrcode_path = os.path.join(src_path, "storage", "qrcode")
 logo_path = os.path.join(src_path, "ui", "assets", "images", "Logo-CookiNUM-v.svg")
 icons_path = os.path.join(src_path, "ui", "assets", "icons")
@@ -21,4 +22,4 @@ def get_ipv4_address():
     return ip_address
 
 
-print(get_ipv4_address())
+print("Test: get_ipv4_address", get_ipv4_address())

@@ -114,9 +114,9 @@ class ActionButtonsSection(QWidget):
         """
         button = self.buttons["start_recording_btn"]
         if is_recording:
-            button.setText("Stop recording")
+            button.setText("Stop")
         else:
-            button.setText("Start recording")
+            button.setText("Enregistrer")
 
     def on_live_mode_changed(self, is_live_mode: bool) -> None:
         """

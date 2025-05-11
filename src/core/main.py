@@ -2,8 +2,10 @@ import sys
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtGui import QFont
 from src.ui.views.main_window import MainWindow
+from src.core.main_controller import MainController
 from src.utils.fonts import add_fonts
 import ctypes
+from src.core.constants import styles_path
 
 
 def main():
@@ -21,10 +23,13 @@ def main():
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(appID)
 
     add_fonts()
-    with open("src/ui/styles/styles.qss", "r") as style:
+    with open(styles_path, "r") as style:
         app.setStyleSheet(app.styleSheet() + style.read())
 
+    # Create the main window and the controller
     window = MainWindow()
+    controller = MainController(window)
+
     window.showMaximized()
     app.setActiveWindow(window)
 

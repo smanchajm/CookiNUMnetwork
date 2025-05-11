@@ -17,6 +17,7 @@ class MediaService(QObject):
         super().__init__(parent)
         self.player = player
         self.is_playing = False
+        self.loop_enabled = True  # Enable loop by default
 
         # Timer pour mettre à jour la position
         self.timer = QTimer(self)
@@ -28,14 +29,7 @@ class MediaService(QObject):
 
     def open_video_file(self, parent_widget=None, start_dir=video_files_path):
         """
-        Ouvre une boîte de dialogue pour sélectionner un fichier vidéo.
-
-        Args:
-            parent_widget: Widget parent pour la boîte de dialogue
-            start_dir: Dossier de départ pour le file explorer (par défaut: dossier personnel)
-
-        Returns:
-            str: Chemin du fichier sélectionné ou None si l'utilisateur a annulé
+        Open a dialog to select a video file.
         """
         if start_dir is None:
             start_dir = os.path.expanduser("~")
@@ -79,29 +73,20 @@ class MediaService(QObject):
         self.is_playing = False
         events.play_state_changed.emit(self.is_playing)
 
-    def toggle_play(self, should_play):
+    def toggle_play(self, should_play: bool) -> None:
         """
-        Change l'état de lecture du lecteur.
-
-        Args:
-            should_play (bool): True pour lancer la lecture, False pour mettre en pause
+        Change the play state of the player.
         """
         if should_play:
             self.play()
         else:
             self.pause()
 
-    def rewind(self, seconds=10):
-        """
-        Recule de quelques secondes dans la lecture.
-
-        Args:
-            seconds (int): Nombre de secondes à reculer.
-        """
+    def rewind(self, seconds: int = 10) -> None:
         self.player.rewind(seconds)
         self._update_position()
 
-    def forward(self, seconds=10):
+    def forward(self, seconds: int = 10) -> None:
         self.player.forward(seconds)
         self._update_position()
 
@@ -110,29 +95,31 @@ class MediaService(QObject):
         events.rate_changed.emit(rate)
         return rate
 
-    def seek(self, position_percent):
+    def seek(self, position_percent: float) -> None:
         """
-        Déplace la lecture à une position spécifique.
-
+        Move to a specific position.
         Args:
-            position_percent (float): Position en pourcentage (0-1)
+            position_percent (float) between 0 and 1
         """
         self.player.seek(position_percent)
         self._update_position()
 
     def _update_position(self):
-        """
-        Met à jour la position actuelle et émet un signal.
-        """
         current_time, total_time = self.player.get_time()
         events.position_changed.emit(current_time, total_time)
 
-        # Si on est à la fin du média, revenir au début
+        # If we are at the end of the media
         if current_time >= total_time - 0.5 and total_time > 0:
-            self.player.stop()
-            self.is_playing = False
-            events.play_state_changed.emit(self.is_playing)
-            events.media_ended.emit()
+            if self.loop_enabled:
+                # Relaunch the playback from the beginning
+                self.player.seek(0)
+                self.play()
+            else:
+                # Stop the playback
+                self.player.stop()
+                self.is_playing = False
+                events.play_state_changed.emit(self.is_playing)
+                events.media_ended.emit()
 
     def set_video_output(self, win_id):
         """
@@ -146,13 +133,12 @@ class MediaService(QObject):
         self.timer.stop()
         self.player.cleanup()
 
-    def reset_video(self):
-        """Réinitialise la vidéo en cours."""
-        self.pause()
-        self.is_playing = False
-        events.play_state_changed.emit(self.is_playing)
-
     def get_current_time(self):
-        """Retourne la position actuelle du lecteur."""
+        """Return the current position of the player."""
         current_time, total_time = self.player.get_time()
         return current_time, total_time
+
+    def toggle_loop(self):
+        """Toggle the loop state of the player."""
+        self.loop_enabled = not self.loop_enabled
+        return self.loop_enabled

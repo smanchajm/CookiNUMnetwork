@@ -13,16 +13,17 @@ class MediaPlayer(QFrame):
     Manages display of live and replay sections.
     """
 
-    def __init__(self, media_service: MediaService, parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("media_player")
-        self.media_service = media_service
+        # self.media_service = media_service
 
         self.setup_ui()
 
     def setup_ui(self):
         self.live_section = MediaLiveSection()
-        self.replay_section = MediaReplaySection(self.media_service)
+        # self.replay_section = MediaReplaySection(self.media_service)
+        self.replay_section = MediaReplaySection()
 
         main_layout = create_vbox_layout(
             widgets=[self.live_section, self.replay_section],

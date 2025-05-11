@@ -69,7 +69,10 @@ class MediaLiveSection(QFrame):
         self._update_display()
 
         # Configurer le lecteur pour lire le flux rtsp (moins de latence)
+        print("Test: on_streaming_started", streaming_rtsp_url)
         self.player.load(streaming_rtsp_url)
+        if self.video_frame.winId():
+            print("Test: on_streaming_started", self.video_frame.winId())
         self.player.set_video_output(self.video_frame.winId())
         self.player.play()
 

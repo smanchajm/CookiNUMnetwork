@@ -40,6 +40,7 @@ class RecordingThread(QThread):
             )
 
             # Open RTMP stream
+            print(f"Opening RTMP stream: {streaming_rtmp_url}")
             self._cap = cv2.VideoCapture(streaming_rtmp_url)
             if not self._cap.isOpened():
                 raise Exception("Could not open video stream")
@@ -48,9 +49,11 @@ class RecordingThread(QThread):
             width = int(self._cap.get(cv2.CAP_PROP_FRAME_WIDTH))
             height = int(self._cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
             fps = int(self._cap.get(cv2.CAP_PROP_FPS))
+            print(f"Video properties: {width}x{height} @ {fps}fps")
 
-            # Create video writer with H.264 codec
-            fourcc = cv2.VideoWriter_fourcc(*"avc1")  # H.264 codec
+            # Create video writer with MP4V codec
+            fourcc = cv2.VideoWriter_fourcc(*"mp4v")  # MP4V codec
+            print(f"Creating video writer with codec: mp4v")
             self._writer = cv2.VideoWriter(
                 self._output_file, fourcc, fps, (width, height), True  # isColor
             )
@@ -63,6 +66,7 @@ class RecordingThread(QThread):
             self.recording_started.emit(self._output_file)
 
         except Exception as e:
+            print(f"Error starting recording: {str(e)}")
             self.recording_error.emit(f"Error starting recording: {str(e)}")
             if self._cap:
                 self._cap.release()

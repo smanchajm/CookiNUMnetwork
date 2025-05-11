@@ -11,10 +11,10 @@ class MediaReplaySection(QFrame):
     Displays video with controls.
     """
 
-    def __init__(self, media_service: MediaService, parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("media_replay_section")
-        self.media_service = media_service
+        # self.media_service = media_service
 
         self.setup_ui()
 
@@ -30,8 +30,8 @@ class MediaReplaySection(QFrame):
 
         self.setLayout(main_layout)
 
-        if self.video_frame.winId():
-            self.media_service.set_video_output(self.video_frame.winId())
+        # if self.video_frame.winId():
+        #     self.media_service.set_video_output(self.video_frame.winId())
 
     def on_play_state_changed(self, is_playing):
         if is_playing:

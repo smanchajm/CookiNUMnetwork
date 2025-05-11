@@ -31,6 +31,7 @@ class EventHandler(QObject):
     media_loaded = pyqtSignal(str)
     media_error = pyqtSignal(str)
     play_state_changed = pyqtSignal(bool)
+    media_ended = pyqtSignal()  # Signal emitted when media playback ends
 
     # Media controls signals
     rewind_signal = pyqtSignal()
@@ -73,6 +74,9 @@ class EventHandler(QObject):
     recording_stopped = pyqtSignal()
     recording_error = pyqtSignal(str)
 
+    # Application events
+    application_closing = pyqtSignal()
+
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(EventHandler, cls).__new__(cls)
@@ -85,5 +89,5 @@ class EventHandler(QObject):
             self._initialized = True
 
 
-# Create a single instance of EventHandler
+# Create a singleton of EventHandler
 events = EventHandler()

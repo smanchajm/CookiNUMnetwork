@@ -26,7 +26,6 @@ class StreamWaiterThread(QThread):
     def run(self):
         """Wait for stream to be available."""
         while self._is_running:
-            print("Test: Checking stream availability")
             try:
                 response = requests.get("http://localhost:9997/v3/rtmpconns/list")
                 if response.status_code == 200:
@@ -36,14 +35,12 @@ class StreamWaiterThread(QThread):
                         print("Test: RTMP stream is available")
                         self.stream_available.emit()
                         return
-                    else:
-                        print("Test: No RTMP connections found")
                 else:
                     print(f"Test: API returned status code {response.status_code}")
             except Exception as e:
                 self.stream_error.emit(f"Error checking stream: {str(e)}")
                 return
-            time.sleep(0.1)  # Réduire l'intervalle de vérification
+            time.sleep(0.5)  # Réduire l'intervalle de vérification
 
 
 class StreamingService(QObject):
@@ -78,12 +75,17 @@ class StreamingService(QObject):
         while time.time() - start_time < timeout:
             print("Test: Waiting for server to be ready")
             if self._is_server_running():
+                print("Test: Server is now ready")
                 return True
-            time.sleep(0.1)  # Réduire l'intervalle de vérification
+            time.sleep(0.5)  # Augmenter l'intervalle pour réduire la charge
+        print("Test: Server failed to start within timeout period")
         return False
 
     def _start_waiting_for_stream(self):
-        """Start waiting for stream in a separate thread."""
+        """
+        Start waiting for stream in a separate thread.
+        Used to wait for a stream to be available without blocking the UI thread.
+        """
         if self.stream_waiter is not None:
             self.stream_waiter.stop()
             self.stream_waiter.wait()
@@ -109,26 +111,18 @@ class StreamingService(QObject):
         """Start the MediaMTX server."""
         try:
             if self.mediamtx_process is not None:
+                print("Test: MediaMTX process already running")
                 return True
 
-            # Ajouter des options pour réduire la latence
-            mediamtx_args = [
-                mediamtx_path,
-                mediamtx_config,
-                "--rtmp-read-timeout",
-                "1s",
-                "--rtmp-write-timeout",
-                "1s",
-                "--hls-segment-duration",
-                "1s",
-                "--hls-part-duration",
-                "0.1s",
-                "--hls-segment-count",
-                "3",
-                "--hls-part-count",
-                "2",
-            ]
+            print("Starting MediaMTX server")
+            # Vérifier si le processus est déjà en cours d'exécution
+            if self._is_server_running():
+                print("Test: MediaMTX server is already running on port 1935")
+                self._start_waiting_for_stream()
+                return True
 
+            mediamtx_args = [mediamtx_path, mediamtx_config]
+            print("Test: Launching MediaMTX")
             self.mediamtx_process = subprocess.Popen(
                 mediamtx_args,
                 stdout=subprocess.PIPE,
@@ -138,6 +132,10 @@ class StreamingService(QObject):
             # Wait for server to be ready
             if not self._wait_for_server():
                 print("Test: MediaMTX server failed to start within timeout")
+                if self.mediamtx_process:
+                    stdout, stderr = self.mediamtx_process.communicate()
+                    print("Test: MediaMTX stdout:", stdout.decode())
+                    print("Test: MediaMTX stderr:", stderr.decode())
                 self.stop_mediamtx()
                 events.streaming_error.emit(
                     "MediaMTX server failed to start within timeout"
@@ -174,8 +172,4 @@ class StreamingService(QObject):
 
     def get_stream_url(self) -> str:
         """Return the RTMP stream URL."""
-        return streaming_rtmp_url
-
-    def get_player_url(self) -> str:
-        """Return the player URL."""
         return streaming_rtmp_url
