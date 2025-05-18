@@ -34,6 +34,7 @@ class MediaReplaySection(QFrame):
         #     self.media_service.set_video_output(self.video_frame.winId())
 
     def on_play_state_changed(self, is_playing):
+        print(f"on_play_state_changed: {is_playing}")
         if is_playing:
             self.controls.play_pause_btn._setup_icon("src/ui/assets/icons/pause.svg")
         else:
@@ -49,5 +50,14 @@ class MediaReplaySection(QFrame):
             position_percent = (current_time / total_time) * 100
             self.controls.update_slider_position(position_percent)
 
-    def add_tag_icon(self, timestamp, total_time):
-        self.controls.on_add_tag(timestamp, total_time)
+    def add_tag_icon(self, timestamp: float, total_time: float) -> None:
+        """
+        Add a tag icon at the specified position.
+
+        Args:
+            timestamp: Position in seconds
+            total_time: Total video duration in seconds
+        """
+        # The tag will be added through the tags_updated signal
+        # This method is kept for backward compatibility but is no longer needed
+        pass

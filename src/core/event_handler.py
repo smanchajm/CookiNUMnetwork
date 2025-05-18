@@ -11,6 +11,9 @@ class EventHandler(QObject):
 
     # Recording signals
     recording_state_changed = pyqtSignal(bool)  # True for recording, False for stopped
+    recording_started = pyqtSignal(str)  # Path to the recording file
+    recording_stopped = pyqtSignal(str)  # Path to the recording file
+    recording_error = pyqtSignal(str)  # Error message
 
     # Tag management signals
     tags_updated = pyqtSignal(list)  # List of all tags
@@ -29,6 +32,7 @@ class EventHandler(QObject):
 
     # Media signals
     media_loaded = pyqtSignal(str)
+    media_loaded_total_time = pyqtSignal(float)
     media_error = pyqtSignal(str)
     play_state_changed = pyqtSignal(bool)
     media_ended = pyqtSignal()  # Signal emitted when media playback ends
@@ -68,11 +72,6 @@ class EventHandler(QObject):
 
     # Speed signals
     speed_changed = pyqtSignal(float)  # New playback speed
-
-    # Recording signals
-    recording_started = pyqtSignal()
-    recording_stopped = pyqtSignal()
-    recording_error = pyqtSignal(str)
 
     # Application events
     application_closing = pyqtSignal()

@@ -9,11 +9,15 @@ logo_path = os.path.join(src_path, "ui", "assets", "images", "Logo-CookiNUM-v.sv
 icons_path = os.path.join(src_path, "ui", "assets", "icons")
 assets_path = os.path.join(src_path, "ui", "assets")
 video_files_path = os.path.join(src_path, "storage", "video_files")
+tags_path = os.path.join(src_path, "storage", "tags")
 workspace_root = os.path.dirname((os.path.dirname(os.path.dirname(__file__))))
 mediamtx_path = os.path.join(workspace_root, "ressources", "mediamtx", "mediamtx.exe")
 mediamtx_config = os.path.join(workspace_root, "ressources", "mediamtx", "mediamtx.yml")
 streaming_rtmp_url = "rtmp://localhost:1935/live/stream"
 streaming_rtsp_url = "rtsp://localhost:8554/live/stream"
+audio_model_path = os.path.join(
+    workspace_root, "ressources", "audio_model", "vosk-model-small-fr-0.22"
+)
 
 
 def get_ipv4_address():

@@ -14,10 +14,6 @@ class RecordingThread(QThread):
     Manages FFmpeg process and file operations asynchronously.
     """
 
-    recording_started = pyqtSignal(str)  # Emits output file path
-    recording_stopped = pyqtSignal(str)  # Emits output file path
-    recording_error = pyqtSignal(str)  # Emits error message
-
     def __init__(self, parent=None):
         super().__init__(parent)
         self._is_running = True
@@ -25,6 +21,7 @@ class RecordingThread(QThread):
         self._cap = None
         self._writer = None
         self._record_thread = None
+        self._start_time = None
 
     def start_recording(self):
         """Start the recording process."""
@@ -61,13 +58,14 @@ class RecordingThread(QThread):
             if not self._writer.isOpened():
                 raise Exception("Could not create video writer")
 
+            self._start_time = datetime.now()
             self._record_thread = threading.Thread(target=self._record_frames)
             self._record_thread.start()
-            self.recording_started.emit(self._output_file)
+            events.recording_started.emit(self._output_file)
 
         except Exception as e:
             print(f"Error starting recording: {str(e)}")
-            self.recording_error.emit(f"Error starting recording: {str(e)}")
+            events.recording_error.emit(f"Error starting recording: {str(e)}")
             if self._cap:
                 self._cap.release()
             if self._writer:
@@ -96,13 +94,19 @@ class RecordingThread(QThread):
             self._cap = None
 
         if self._output_file and os.path.exists(self._output_file):
-            self.recording_stopped.emit(self._output_file)
+            events.recording_stopped.emit(self._output_file)
 
     def stop(self):
         """Stop the thread."""
         self._is_running = False
         self.stop_recording()
         self.wait()
+
+    def get_recording_duration(self) -> float:
+        """Get the current recording duration in seconds."""
+        if self._start_time is None:
+            return 0
+        return (datetime.now() - self._start_time).total_seconds()
 
 
 class RecordingService(QObject):
@@ -123,23 +127,30 @@ class RecordingService(QObject):
         if self._recording_thread is not None:
             # Disconnect old signals
             try:
-                self._recording_thread.recording_started.disconnect()
-                self._recording_thread.recording_stopped.disconnect()
-                self._recording_thread.recording_error.disconnect()
+                events.recording_started.disconnect()
+                events.recording_stopped.disconnect()
+                events.recording_error.disconnect()
             except (TypeError, RuntimeError):
                 pass  # Ignore if signals were already disconnected
             self._recording_thread.deleteLater()
 
         # Create new thread
         self._recording_thread = RecordingThread(self)
-        self._recording_thread.recording_started.connect(self._on_recording_started)
-        self._recording_thread.recording_stopped.connect(self._on_recording_stopped)
-        self._recording_thread.recording_error.connect(self._on_recording_error)
+        events.recording_started.connect(self._on_recording_started)
+        events.recording_stopped.connect(self._on_recording_stopped)
+        events.recording_error.connect(self._on_recording_error)
 
     @property
     def is_recording(self) -> bool:
         """Indicates if recording is in progress."""
         return self._is_recording
+
+    @property
+    def current_recording_path(self) -> str:
+        """Get the path of the current recording file."""
+        if self._recording_thread and self._is_recording:
+            return self._recording_thread._output_file
+        return None
 
     def _on_recording_started(self, output_file: str):
         """Handle recording started event from thread."""
@@ -188,9 +199,9 @@ class RecordingService(QObject):
             try:
                 # Disconnect signals first
                 try:
-                    self._recording_thread.recording_started.disconnect()
-                    self._recording_thread.recording_stopped.disconnect()
-                    self._recording_thread.recording_error.disconnect()
+                    events.recording_started.disconnect()
+                    events.recording_stopped.disconnect()
+                    events.recording_error.disconnect()
                 except (TypeError, RuntimeError):
                     pass  # Ignore if signals were already disconnected
 

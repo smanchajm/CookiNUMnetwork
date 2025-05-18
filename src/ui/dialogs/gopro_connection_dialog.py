@@ -10,7 +10,7 @@ from PyQt6.QtGui import QPixmap
 
 from src.ui.widgets.action_button import ActionButton
 from src.core.camera_connection.gopro_service import GoProService
-from src.core.constants import qrcode_path
+from src.core.constants import qrcode_path, streaming_rtmp_url
 
 
 class GoProConnectionDialog(QDialog):
@@ -49,7 +49,7 @@ class GoProConnectionDialog(QDialog):
     def generate_qrcode(self):
         # Pour l'instant, on utilise un placeholder
         placeholder_content = "https://gopro.com/connect"
-        self.gopro_service.qrcode_gopro(placeholder_content)
+        self.gopro_service.qrcode_gopro(streaming_rtmp_url)
 
         # Afficher le QR code généré
         qrcode_file = os.path.join(qrcode_path, "gopro_qrcode.png")

@@ -6,6 +6,7 @@ from src.core.video_processing.player import VLCPlayer
 from src.core.video_processing.recording_service import RecordingService
 from src.core.video_processing.tag_service import TagService
 from src.core.streaming.streaming_service import StreamingService
+from src.core.voice_recognition.voice_service import VoiceService
 from src.ui.dialogs.dialog_service import DialogService
 from src.core.event_handler import events
 
@@ -32,6 +33,7 @@ class MainController:
         self.media_service = MediaService(self.replay_player, parent=main_window)
         self.gopro_service = GoProService(parent=main_window)
         self.dialog_service = DialogService(parent=main_window)
+        self.voice_service = VoiceService(parent=main_window)
 
         # Set video output for replay player
         if self.main_window.media_player.replay_section.video_frame.winId():
@@ -50,6 +52,9 @@ class MainController:
         self.mode_manager.initialize()
         events.recording_state_changed.emit(self.recording_service.is_recording)
         self.gopro_service.start_streaming()
+        print("Starting voice service")
+        self.voice_service.start()
+        print("Voice service started")
 
     def setup_connections(self):
         """Configure all signal connections between components."""
@@ -68,8 +73,18 @@ class MainController:
         def on_mode_changed(old_mode: Mode, new_mode: Mode) -> None:
             """Callback called when mode changes."""
             self.media_service.pause()
+
             if new_mode == Mode.LIVE:
                 self.tag_manager.clear_tags()
+                if self.recording_service.is_recording:
+                    recording_path = self.recording_service.current_recording_path
+                    self.tag_manager.current_video_path = recording_path
+            else:  # REVIEW mode
+                self.tag_manager.clear_tags()
+                self.tag_manager.current_video_path = (
+                    self.media_service.current_video_path
+                )
+                self.tag_manager.reload_tags()
 
         self.mode_manager.add_transition_callback(on_mode_changed)
 
@@ -84,7 +99,7 @@ class MainController:
         events.review_mode_clicked.connect(self.mode_manager.toggle_review_mode)
 
         # Tag connections
-        events.add_tag_clicked.connect(self.on_add_tag)
+        events.add_tag_clicked.connect(self._on_add_tag_clicked)
         events.tag_selected.connect(self.on_tag_selected)
 
     def _setup_media_connections(self):
@@ -103,6 +118,12 @@ class MainController:
             self.main_window.media_player.on_play_state_changed
         )
 
+        # Load tags when a video is loaded
+        events.media_loaded.connect(self.tag_manager.load_tags_for_video)
+        events.media_loaded_total_time.connect(
+            self.main_window.media_player.replay_section.controls.update_total_time
+        )
+
     def _setup_state_connections(self):
         """Configure connections for state changes."""
         # Connect streaming state changes
@@ -119,24 +140,36 @@ class MainController:
         )
         events.live_mode_changed.connect(self.main_window.media_player.update_display)
 
-        # Recording state connections - only update UI
+        # Recording state connections
         events.recording_state_changed.connect(
             self.main_window.sidebar.action_section.update_recording_state
         )
         events.recording_state_changed.connect(
             self.main_window.media_player.update_recording_state
         )
+        # Update video path when recording starts/stops
+        events.recording_state_changed.connect(self._on_recording_state_changed)
 
         # Tag connections
         events.tags_updated.connect(
             self.main_window.sidebar.tag_section.on_tags_changed
         )
+        events.tags_updated.connect(
+            self.main_window.media_player.replay_section.controls.on_tags_changed
+        )
 
-    def on_add_tag(self) -> None:
-        """Handle adding a new tag at the current position."""
-        current_time, total_time = self.media_service.get_current_time()
-        self.tag_manager.create_and_add_tag(current_time)
-        self.main_window.media_player.add_tag_marker_at(current_time, total_time)
+    def _on_recording_state_changed(self, is_recording: bool) -> None:
+        """Handle recording state changes."""
+        if self.mode_manager.get_mode() == Mode.LIVE:
+            if is_recording:
+                # When recording starts, set the video path and clear tags
+                recording_path = self.recording_service.current_recording_path
+                if recording_path:
+                    self.tag_manager.current_video_path = recording_path
+                    self.tag_manager.clear_tags()
+            else:
+                # When recording stops, clear the video path
+                self.tag_manager.current_video_path = None
 
     def on_tag_selected(self, timestamp_str: str) -> None:
         """
@@ -147,7 +180,7 @@ class MainController:
         """
         try:
             timestamp_seconds = float(timestamp_str)
-            _, total_time = self.replay_player.get_time()
+            total_time = self.media_service.total_time
 
             if total_time > 0:
                 position_percent = timestamp_seconds / total_time
@@ -159,6 +192,16 @@ class MainController:
         except ValueError:
             self.dialog_service.show_error_message("Invalid timestamp format")
 
+    def _on_add_tag_clicked(self) -> None:
+        """Handle add tag button click."""
+        if self.mode_manager.get_mode() == Mode.LIVE:
+            if self.recording_service.is_recording:
+                self.tag_manager.add_tag_at_time(
+                    self.recording_service._recording_thread.get_recording_duration()
+                )
+        else:
+            self.tag_manager.add_tag_at_time(self.media_service.get_current_time()[0])
+
     def cleanup(self):
         """Clean up all resources before application shutdown."""
         print("Test: Application closing, cleaning up resources...")
@@ -169,5 +212,7 @@ class MainController:
             self.streaming_service.stop_mediamtx()
         if hasattr(self, "media_service"):
             self.media_service.cleanup()
+        if hasattr(self, "voice_service"):
+            self.voice_service.stop()
 
         print("Test: Cleanup completed")

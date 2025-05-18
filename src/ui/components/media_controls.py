@@ -69,6 +69,7 @@ class MediaControls(QWidget):
         self.setObjectName("media_controls")
         self.is_playing = False
         self.is_programmatic_update = False
+        self.total_time = 0  # Store total time
         self.setup_ui()
 
     def setup_ui(self):
@@ -119,6 +120,7 @@ class MediaControls(QWidget):
         self.play_pause_btn.clicked.connect(self.toggle_play)
         self.forward_btn.clicked.connect(events.forward_signal.emit)
         self.progress_slider.valueChanged.connect(self.on_slider_value_changed)
+        events.position_changed.connect(self.update_timeline)
 
     def toggle_play(self):
         """Toggle playback state and update interface."""
@@ -150,16 +152,34 @@ class MediaControls(QWidget):
         print(f"[Controls] Slider value changed to {value}%")
         events.seek_signal.emit(value / 100.0)  # Convert to percentage (0-1)
 
-    def on_add_tag(self, timestamp, total_time):
+    def on_tags_changed(self, tags: list[tuple[str, str, str]]):
         """
-        Add a tag marker on the slider at the specified position.
+        Handle tags data changes and update markers.
 
         Args:
-            timestamp (float): Tag position in seconds
-            total_time (float): Total video duration in seconds
+            tags: List of tuples containing (timestamp, name, display_time)
         """
-        if total_time == 0 or timestamp > total_time:
+        # Store current tags
+        self.current_tags = tags
+
+        # Clear existing markers
+        self.progress_slider.clear_tag_markers()
+
+        if not tags or self.total_time <= 0:
             return
 
-        position = timestamp / total_time
-        self.progress_slider.add_tag_marker(position)
+        # Add markers for each tag
+        for timestamp, _, _ in tags:
+            try:
+                timestamp_float = float(timestamp)
+                position = timestamp_float / self.total_time
+                self.progress_slider.add_tag_marker(position)
+            except (ValueError, TypeError):
+                continue
+
+    def update_total_time(self, total_time):
+        print(f"Updating total time to {total_time}")
+        self.total_time = total_time
+        # Refresh tag markers with the new total time
+        if hasattr(self, "current_tags"):
+            self.on_tags_changed(self.current_tags)

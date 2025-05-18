@@ -18,6 +18,8 @@ class MediaService(QObject):
         self.player = player
         self.is_playing = False
         self.loop_enabled = True  # Enable loop by default
+        self.current_video_path = None
+        self.total_time = 0  # Store total time as class attribute
 
         # Timer pour mettre à jour la position
         self.timer = QTimer(self)
@@ -56,12 +58,27 @@ class MediaService(QObject):
 
     def load_media(self, path):
         if self.player.load(path):
+            self.current_video_path = path
+            # Start playing to ensure media is fully loaded
             self.play()
+            # Get total time after a short delay to ensure it's available
+            QTimer.singleShot(1000, self._get_total_time)
             return True
         else:
             self.pause()
             events.media_error.emit(f"Impossible de charger le fichier: {path}")
             return False
+
+    def _get_total_time(self):
+        """Get the total time after media is loaded and playing."""
+        _, total_time = self.player.get_time()
+        if total_time > 0:
+            self.total_time = total_time
+            events.media_loaded_total_time.emit(total_time)
+            print(f"Total time set: {total_time}")
+        else:
+            # If still not available, try again
+            QTimer.singleShot(500, self._get_total_time)
 
     def play(self):
         self.player.play()
@@ -105,11 +122,11 @@ class MediaService(QObject):
         self._update_position()
 
     def _update_position(self):
-        current_time, total_time = self.player.get_time()
-        events.position_changed.emit(current_time, total_time)
+        current_time, _ = self.player.get_time()
+        events.position_changed.emit(current_time, self.total_time)
 
         # If we are at the end of the media
-        if current_time >= total_time - 0.5 and total_time > 0:
+        if current_time >= self.total_time - 0.5 and self.total_time > 0:
             if self.loop_enabled:
                 # Relaunch the playback from the beginning
                 self.player.seek(0)
@@ -135,8 +152,12 @@ class MediaService(QObject):
 
     def get_current_time(self):
         """Return the current position of the player."""
-        current_time, total_time = self.player.get_time()
-        return current_time, total_time
+        current_time, _ = self.player.get_time()
+        return current_time, self.total_time
+
+    def get_total_time(self):
+        """Return the total duration of the player."""
+        return self.total_time
 
     def toggle_loop(self):
         """Toggle the loop state of the player."""

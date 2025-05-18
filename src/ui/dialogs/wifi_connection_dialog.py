@@ -79,8 +79,11 @@ class WiFiConnectionDialog(QDialog):
         layout.addWidget(self.close_button)
 
     def generate_qrcode(self):
-        ssid = self.ssid_input.text().strip()
-        password = self.password_input.text()
+        # ssid = self.ssid_input.text().strip()
+        # password = self.password_input.text()
+
+        ssid = "iPhone de Samuel"
+        password = "samlepompierutc"
 
         if not ssid:
             self.status_label.setText("Veuillez entrer un nom de réseau (SSID)")
