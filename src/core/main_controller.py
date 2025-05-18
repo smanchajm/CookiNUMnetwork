@@ -9,6 +9,7 @@ from src.core.streaming.streaming_service import StreamingService
 from src.core.voice_recognition.voice_service import VoiceService
 from src.ui.dialogs.dialog_service import DialogService
 from src.core.event_handler import events
+from src.core.keyboard_shortcuts_service import KeyboardShortcutsService
 
 
 class MainController:
@@ -34,6 +35,7 @@ class MainController:
         self.gopro_service = GoProService(parent=main_window)
         self.dialog_service = DialogService(parent=main_window)
         self.voice_service = VoiceService(parent=main_window)
+        self.keyboard_shortcuts_service = KeyboardShortcutsService(parent=main_window)
 
         # Set video output for replay player
         if self.main_window.media_player.replay_section.video_frame.winId():
@@ -105,7 +107,7 @@ class MainController:
     def _setup_media_connections(self):
         """Configure connections for media control."""
         # Playback control connections
-        events.play_pause_signal.connect(self.media_service.toggle_play)
+        events.play_pause_signal.connect(self.media_service.toggle_play_pause)
         events.rewind_signal.connect(lambda: self.media_service.rewind(10))
         events.forward_signal.connect(lambda: self.media_service.forward(10))
         events.seek_signal.connect(self.media_service.seek)

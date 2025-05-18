@@ -121,17 +121,18 @@ class MediaControls(QWidget):
         self.forward_btn.clicked.connect(events.forward_signal.emit)
         self.progress_slider.valueChanged.connect(self.on_slider_value_changed)
         events.position_changed.connect(self.update_timeline)
+        events.play_state_changed.connect(self.on_play_state_changed)
 
     def toggle_play(self):
         """Toggle playback state and update interface."""
-        self.is_playing = not self.is_playing
+        events.play_pause_signal.emit()
 
-        if self.is_playing:
+    def on_play_state_changed(self, is_playing: bool):
+        """Update UI based on play state."""
+        if is_playing:
             self.play_pause_btn._setup_icon("src/ui/assets/icons/pause.svg")
         else:
             self.play_pause_btn._setup_icon("src/ui/assets/icons/play_arrow.svg")
-
-        events.play_pause_signal.emit(self.is_playing)
 
     def update_timeline(self, current_time, total_time):
         current_formatted = time.strftime("%M:%S", time.gmtime(current_time))

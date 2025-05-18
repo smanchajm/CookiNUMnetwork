@@ -58,9 +58,9 @@ class VoiceService(QObject):
 
         # Command mapping
         self.commands = {
-            "play": lambda: events.play_pause_signal.emit(True),
-            "jouer": lambda: events.play_pause_signal.emit(True),
-            "pause": lambda: events.play_pause_signal.emit(False),
+            "play": lambda: events.play_pause_signal.emit(),
+            "jouer": lambda: events.play_pause_signal.emit(),
+            "pause": lambda: events.play_pause_signal.emit(),
             "avancer": lambda: events.forward_signal.emit(),
             "reculer": lambda: events.rewind_signal.emit(),
             "ajouter un tag": lambda: events.add_tag_clicked.emit(),
@@ -105,12 +105,32 @@ class VoiceService(QObject):
         """Stop the voice recognition service."""
         print("Stopping voice recognition service...")
         self.is_running = False
+
+        # Clear the audio queue to prevent blocking
+        while not self.audio_queue.empty():
+            try:
+                self.audio_queue.get_nowait()
+            except queue.Empty:
+                break
+        # Stop audio stream if it exists
+        try:
+            sd.stop()
+        except Exception as e:
+            print(f"Error stopping audio stream: {e}")
+
+        # Join threads with timeout
         if self.thread:
-            self.thread.join()
+            self.thread.join(timeout=1.0)
+            if self.thread.is_alive():
+                print("Warning: Audio processing thread did not terminate gracefully")
             self.thread = None
+
         if self.audio_thread:
-            self.audio_thread.join()
+            self.audio_thread.join(timeout=2.0)
+            if self.audio_thread.is_alive():
+                print("Warning: Audio recording thread did not terminate gracefully")
             self.audio_thread = None
+
         print("Voice recognition service stopped")
 
     def _start_audio_recording(self):

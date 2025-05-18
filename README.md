@@ -34,7 +34,29 @@ pip install -r requirements.txt
 - Appairage par QR code
 - Reconnaissance vocale pour le contrôle
 - Système de tagging vidéo
+- Raccourcis clavier pour un contrôle rapide
 
+## ⌨️ Raccourcis clavier
+
+L'application propose plusieurs raccourcis clavier pour faciliter son utilisation :
+
+### Contrôle de la lecture
+- `Espace` : Lecture/Pause
+- `Flèche droite` : Avancer de 10 secondes
+- `Flèche gauche` : Reculer de 10 secondes
+
+### Modes
+- `D` : Passer en mode direct
+- `R` : Passer en mode révision
+
+### Enregistrement
+- `E` : Démarrer/Arrêter l'enregistrement
+
+### Tags
+- `T` : Ajouter un tag à la position actuelle
+
+### Fichiers
+- `Ctrl + O` : Ouvrir un fichier vidéo
 
 ## 🔧 Configuration
 

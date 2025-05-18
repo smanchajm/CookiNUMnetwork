@@ -35,12 +35,13 @@ class EventHandler(QObject):
     media_loaded_total_time = pyqtSignal(float)
     media_error = pyqtSignal(str)
     play_state_changed = pyqtSignal(bool)
+    toggle_play_signal = pyqtSignal()
     media_ended = pyqtSignal()  # Signal emitted when media playback ends
 
     # Media controls signals
     rewind_signal = pyqtSignal()
     forward_signal = pyqtSignal()
-    play_pause_signal = pyqtSignal(bool)
+    play_pause_signal = pyqtSignal()
     seek_signal = pyqtSignal(float)
     slow_down_signal = pyqtSignal()
     position_changed = pyqtSignal(float, float)

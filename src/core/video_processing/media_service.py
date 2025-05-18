@@ -99,6 +99,13 @@ class MediaService(QObject):
         else:
             self.pause()
 
+    def toggle_play_pause(self):
+        """Toggle the play state of the player."""
+        if self.is_playing:
+            self.pause()
+        else:
+            self.play()
+
     def rewind(self, seconds: int = 10) -> None:
         self.player.rewind(seconds)
         self._update_position()
