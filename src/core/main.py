@@ -4,8 +4,8 @@ from PyQt6.QtGui import QFont
 from src.ui.views.main_window import MainWindow
 from src.core.main_controller import MainController
 from src.utils.fonts import add_fonts
+from src.ui.styles.style_manager import StyleManager
 import ctypes
-from src.core.constants import styles_path
 
 
 def main():
@@ -23,8 +23,10 @@ def main():
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(appID)
 
     add_fonts()
-    with open(styles_path, "r") as style:
-        app.setStyleSheet(app.styleSheet() + style.read())
+
+    # Chargement des styles via le StyleManager
+    styles = StyleManager.load_styles()
+    app.setStyleSheet(app.styleSheet() + styles)
 
     # Create the main window and the controller
     window = MainWindow()

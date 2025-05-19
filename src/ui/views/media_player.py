@@ -1,7 +1,5 @@
 from PyQt6.QtWidgets import QFrame
 
-from src.core.video_processing.media_service import MediaService
-from src.core.video_processing.mode_service import Mode
 from src.ui.components.media_live_section import MediaLiveSection
 from src.ui.components.media_replay_section import MediaReplaySection
 from src.ui.utils.layouts import create_vbox_layout
@@ -16,13 +14,10 @@ class MediaPlayer(QFrame):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("media_player")
-        # self.media_service = media_service
-
         self.setup_ui()
 
     def setup_ui(self):
         self.live_section = MediaLiveSection()
-        # self.replay_section = MediaReplaySection(self.media_service)
         self.replay_section = MediaReplaySection()
 
         main_layout = create_vbox_layout(
@@ -60,16 +55,6 @@ class MediaPlayer(QFrame):
         else:
             self.live_section.hide()
             self.replay_section.show()
-
-    def add_tag_marker_at(self, current_time: float, total_time: float) -> None:
-        """
-        Add a tag marker at the specified position.
-
-        Args:
-            current_time: Timestamp where to add the marker.
-            total_time: Total video duration.
-        """
-        self.replay_section.add_tag_icon(current_time, total_time)
 
     def set_recording_indicator(self, visible: bool) -> None:
         """Show or hide the recording indicator overlay."""

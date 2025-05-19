@@ -4,11 +4,11 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from src.core.constants import logo_path
 from src.core.event_handler import events
 from src.ui.utils.layouts import create_hbox_layout
 from src.ui.views.sidebar import Sidebar
 from src.ui.views.media_player import MediaPlayer
+from src.utils.resource_manager import ResourceManager
 
 
 class MainWindow(QMainWindow):
@@ -20,7 +20,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("CookiNUMnetwork")
-        self.setWindowIcon(QIcon(logo_path))
+        self.setWindowIcon(QIcon(ResourceManager.get_icon_path("Logo-CookiNUM-v.svg")))
 
         self.setup_ui()
 

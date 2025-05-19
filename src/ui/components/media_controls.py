@@ -7,6 +7,7 @@ from PyQt6.QtGui import QIcon, QPainter
 from src.ui.widgets.action_button import ActionButton
 from src.ui.utils.layouts import create_vbox_layout, create_hbox_layout
 from src.core.event_handler import events
+from src.utils.resource_manager import ResourceManager
 
 
 class ProgressSlider(QSlider):
@@ -15,7 +16,7 @@ class ProgressSlider(QSlider):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.tag_positions = []
-        self.tag_icon = QIcon("src/ui/assets/icons/tag.svg")
+        self.tag_icon = QIcon(str(ResourceManager.get_icon_path("tag.svg")))
         self.tag_icon_size = 20
         self.tag_pixmap = self.tag_icon.pixmap(self.tag_icon_size, self.tag_icon_size)
 
@@ -71,19 +72,20 @@ class MediaControls(QWidget):
         self.is_programmatic_update = False
         self.total_time = 0  # Store total time
         self.setup_ui()
+        self.setup_connections()
 
     def setup_ui(self):
         self.rewind_btn = ActionButton(
-            icon_path="src/ui/assets/icons/skip_previous.svg",
+            icon_path=ResourceManager.get_icon_path("skip_previous.svg"),
         )
         self.play_pause_btn = ActionButton(
-            icon_path="src/ui/assets/icons/play_arrow.svg",
+            icon_path=ResourceManager.get_icon_path("play_arrow.svg"),
         )
         self.forward_btn = ActionButton(
-            icon_path="src/ui/assets/icons/skip_next.svg",
+            icon_path=ResourceManager.get_icon_path("skip_next.svg"),
         )
         self.slow_down_btn = ActionButton(
-            icon_path="src/ui/assets/icons/slow_motion_video.svg",
+            icon_path=ResourceManager.get_icon_path("slow_motion_video.svg"),
         )
 
         self.timeline_label = QLabel("00:00/00:00")
@@ -112,9 +114,8 @@ class MediaControls(QWidget):
         )
 
         self.setLayout(main_layout)
-        self._connect_signals()
 
-    def _connect_signals(self):
+    def setup_connections(self):
         self.slow_down_btn.clicked.connect(events.slow_down_signal.emit)
         self.rewind_btn.clicked.connect(events.rewind_signal.emit)
         self.play_pause_btn.clicked.connect(self.toggle_play)
@@ -130,9 +131,11 @@ class MediaControls(QWidget):
     def on_play_state_changed(self, is_playing: bool):
         """Update UI based on play state."""
         if is_playing:
-            self.play_pause_btn._setup_icon("src/ui/assets/icons/pause.svg")
+            self.play_pause_btn._setup_icon(ResourceManager.get_icon_path("pause.svg"))
         else:
-            self.play_pause_btn._setup_icon("src/ui/assets/icons/play_arrow.svg")
+            self.play_pause_btn._setup_icon(
+                ResourceManager.get_icon_path("play_arrow.svg")
+            )
 
     def update_timeline(self, current_time, total_time):
         current_formatted = time.strftime("%M:%S", time.gmtime(current_time))

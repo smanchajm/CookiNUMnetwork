@@ -2,13 +2,17 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtCore import Qt
 
-from src.core import constants
+from src.utils.resource_manager import ResourceManager
 
 
 class LogoSection(QWidget):
     """Widget to display the logo in the sidebar."""
 
-    def __init__(self, logo_path=constants.logo_path, parent=None):
+    def __init__(
+        self,
+        logo_path=ResourceManager.get_icon_path("Logo-CookiNUM-v.svg"),
+        parent=None,
+    ):
         super().__init__(parent)
         self.setObjectName("logo_section")
 

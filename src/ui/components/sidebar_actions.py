@@ -6,6 +6,7 @@ from src.core.video_processing.mode_service import Mode
 from src.ui.utils.layouts import create_vbox_layout
 from src.ui.widgets.action_button import ActionButton
 from src.ui.widgets.separator import Separator
+from src.utils.resource_manager import ResourceManager
 
 
 class ActionButtonsSection(QWidget):
@@ -19,13 +20,13 @@ class ActionButtonsSection(QWidget):
             (
                 "Mode Direct",
                 "live_mode_btn",
-                constants.icons_path + "/camera_video.svg",
+                ResourceManager.get_icon_path("camera_video.svg"),
                 events.live_mode_clicked,
             ),
             (
                 "Mode Replay",
                 "review_mode_btn",
-                constants.icons_path + "/movie.svg",
+                ResourceManager.get_icon_path("movie.svg"),
                 events.review_mode_clicked,
             ),
         ]
@@ -34,25 +35,25 @@ class ActionButtonsSection(QWidget):
             (
                 "Ouvrir une vidéo",
                 "open_video_btn",
-                "src/ui/assets/icons/folder_open.svg",
+                ResourceManager.get_icon_path("folder_open.svg"),
                 events.open_video_clicked,
             ),
             (
                 "Enregistrer",
                 "start_recording_btn",
-                "src/ui/assets/icons/radio_button_checked.svg",
+                ResourceManager.get_icon_path("radio_button_checked.svg"),
                 events.start_recording_clicked,
             ),
             (
                 "Connexion GoPro",
                 "connect_gopro_btn",
-                "src/ui/assets/icons/qr_code_scanner.svg",
+                ResourceManager.get_icon_path("qr_code_scanner.svg"),
                 events.connect_gopro_clicked,
             ),
             (
                 "Connexion WiFi",
                 "connect_wifi_btn",
-                "src/ui/assets/icons/wifi.svg",
+                ResourceManager.get_icon_path("wifi.svg"),
                 events.connect_wifi_clicked,
             ),
         ]

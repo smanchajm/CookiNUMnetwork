@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import QFrame
 from src.core.video_processing.media_service import MediaService
 from src.ui.components.media_controls import MediaControls
 from src.ui.utils.layouts import create_vbox_layout
+from src.utils.resource_manager import ResourceManager
 
 
 class MediaReplaySection(QFrame):
@@ -14,7 +15,6 @@ class MediaReplaySection(QFrame):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("media_replay_section")
-        # self.media_service = media_service
 
         self.setup_ui()
 
@@ -30,16 +30,15 @@ class MediaReplaySection(QFrame):
 
         self.setLayout(main_layout)
 
-        # if self.video_frame.winId():
-        #     self.media_service.set_video_output(self.video_frame.winId())
-
     def on_play_state_changed(self, is_playing):
         print(f"on_play_state_changed: {is_playing}")
         if is_playing:
-            self.controls.play_pause_btn._setup_icon("src/ui/assets/icons/pause.svg")
+            self.controls.play_pause_btn._setup_icon(
+                ResourceManager.get_icon_path("pause.svg")
+            )
         else:
             self.controls.play_pause_btn._setup_icon(
-                "src/ui/assets/icons/play_arrow.svg"
+                ResourceManager.get_icon_path("play_arrow.svg")
             )
         self.controls.is_playing = is_playing
 
@@ -49,15 +48,3 @@ class MediaReplaySection(QFrame):
         if total_time > 0:
             position_percent = (current_time / total_time) * 100
             self.controls.update_slider_position(position_percent)
-
-    def add_tag_icon(self, timestamp: float, total_time: float) -> None:
-        """
-        Add a tag icon at the specified position.
-
-        Args:
-            timestamp: Position in seconds
-            total_time: Total video duration in seconds
-        """
-        # The tag will be added through the tags_updated signal
-        # This method is kept for backward compatibility but is no longer needed
-        pass

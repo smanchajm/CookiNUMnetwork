@@ -12,6 +12,7 @@ from src.ui.widgets.action_button import ActionButton
 from src.ui.utils.layouts import create_vbox_layout
 from src.ui.utils.qt_helpers import clear_layout
 from src.core.event_handler import events
+from src.utils.resource_manager import ResourceManager
 
 
 class TagListSection(QWidget):
@@ -29,7 +30,7 @@ class TagListSection(QWidget):
         self.tag_list_title.setObjectName("tag_list_title")
 
         self.add_tag_button = ActionButton(
-            text="Ajouter un tag", icon_path="src/ui/assets/icons/add.svg"
+            text="Ajouter un tag", icon_path=ResourceManager.get_icon_path("add.svg")
         )
         self.add_tag_button.setObjectName("add_tag_button")
         self.add_tag_button.clicked.connect(events.add_tag_clicked.emit)
