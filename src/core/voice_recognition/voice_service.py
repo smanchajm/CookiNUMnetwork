@@ -1,18 +1,91 @@
+import json
 import queue
 import threading
-import json
-import sounddevice as sd
+
 import numpy as np
-from vosk import Model, KaldiRecognizer
-from PyQt6.QtCore import QObject, pyqtSignal
-from src.core.event_handler import events
-from src.core.constants import audio_model_path
+import sounddevice as sd
+from num2words import num2words
+from PyQt6.QtCore import QObject
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from vosk import Model, KaldiRecognizer
+
+from src.core.constants import audio_model_path_fr
+from src.core.event_handler import events
 from src.core.voice_recognition.canonical_phrases import (
     CANONICAL_PHRASES,
     INTENT_TO_COMMAND,
+    TRIGGER_PHRASES,
+    IMPORTANT_WORDS,
 )
+
+
+class EnhancedCommandMatcher:
+    def __init__(self, min_similarity=0.4):
+        self.commands = {}
+        self.command_texts = []
+        self.command_mapping = {}
+        self.min_similarity = min_similarity
+        self.vectorizer = TfidfVectorizer(analyzer="word", ngram_range=(1, 2))
+
+    def add_command(self, command_id, action, main_phrase=None, variants=None):
+        self.commands[command_id] = action
+        if main_phrase:
+            self.command_texts.append(main_phrase)
+            self.command_mapping[main_phrase] = command_id
+        if variants:
+            for variant in variants:
+                if variant:
+                    self.command_texts.append(variant)
+                    self.command_mapping[variant] = command_id
+
+    def match_command(self, text):
+        if not self.command_texts:
+            return None, 0.0, None
+
+        # Check exact match
+        if text in self.command_mapping:
+            command_id = self.command_mapping[text]
+            return command_id, 1.0, self.commands[command_id]
+
+        # Check partial match
+        best_match = None
+        best_score = 0.0
+        for cmd_text, cmd_id in self.command_mapping.items():
+            cmd_words = set(cmd_text.split())
+            input_words = set(text.split())
+            matching_words = cmd_words.intersection(input_words)
+            if matching_words:
+                score = sum(
+                    len(word) for word in matching_words if len(word) > 3
+                ) / len(cmd_words)
+                if any(word in IMPORTANT_WORDS for word in matching_words):
+                    score *= 1.5
+                if score > best_score:
+                    best_score = score
+                    best_match = (cmd_id, score)
+
+        if best_match and best_score >= 0.6:
+            cmd_id, score = best_match
+            return cmd_id, score, self.commands[cmd_id]
+
+        # Use TF-IDF + cosine similarity
+        try:
+            tfidf_matrix = self.vectorizer.fit_transform(self.command_texts + [text])
+            similarities = cosine_similarity(
+                tfidf_matrix[-1], tfidf_matrix[:-1]
+            ).flatten()
+            best_idx = np.argmax(similarities)
+            best_similarity = similarities[best_idx]
+
+            if best_similarity >= self.min_similarity:
+                best_command_text = self.command_texts[best_idx]
+                command_id = self.command_mapping[best_command_text]
+                return command_id, best_similarity, self.commands[command_id]
+        except Exception as e:
+            print(f"Error in command matching: {e}")
+
+        return None, 0.0, None
 
 
 class VoiceService(QObject):
@@ -27,67 +100,102 @@ class VoiceService(QObject):
         self.is_running = False
         self.thread = None
         self.audio_thread = None
-
-        # Initialize Vosk model
         self.model = None
         self.recognizer = None
-        self._initialize_model()
+        self.command_matcher = EnhancedCommandMatcher(min_similarity=0.4)
+        self._initialize_models()
+        self._initialize_commands()
 
-        # Initialize TF-IDF vectorizer for semantic matching
-        print("Initializing TF-IDF vectorizer...")
-        self.vectorizer = TfidfVectorizer(
-            analyzer="word",
-            ngram_range=(1, 2),  # Use both unigrams and bigrams
-            min_df=1,  # Minimum document frequency
-            max_df=1.0,  # Maximum document frequency
-            strip_accents="unicode",
-            lowercase=True,
-        )
-
-        # Prepare all phrases for vectorization
-        self.all_phrases = []
-        self.phrase_to_intent = {}
-        for intent, phrases in CANONICAL_PHRASES.items():
-            for phrase in phrases:
-                self.all_phrases.append(phrase)
-                self.phrase_to_intent[phrase] = intent
-
-        # Fit the vectorizer and transform all phrases
-        self.phrase_vectors = self.vectorizer.fit_transform(self.all_phrases)
-        print("TF-IDF vectorizer initialized")
-
-        # Command mapping
-        self.commands = {
-            "play": lambda: events.play_pause_signal.emit(),
-            "jouer": lambda: events.play_pause_signal.emit(),
-            "pause": lambda: events.play_pause_signal.emit(),
-            "avancer": lambda: events.forward_signal.emit(),
-            "reculer": lambda: events.rewind_signal.emit(),
-            "ajouter un tag": lambda: events.add_tag_clicked.emit(),
-            "démarrer enregistrement": lambda: events.start_recording_clicked.emit(),
-            "arrêter enregistrement": lambda: events.start_recording_clicked.emit(),
-            "mode direct": lambda: events.live_mode_clicked.emit(),
-            "mode révision": lambda: events.review_mode_clicked.emit(),
-            "ouvrir": lambda: events.open_video_clicked.emit(),
-        }
-
-    def _initialize_model(self):
-        """Initialize the Vosk model with proper path handling."""
+    def _initialize_models(self):
+        """Initialize French Vosk model with proper path handling."""
         try:
-            print(f"Loading Vosk model from: {audio_model_path}")
-            self.model = Model(audio_model_path)
+            print(f"Loading French Vosk model from: {audio_model_path_fr}")
+            self.model = Model(audio_model_path_fr)
             self.recognizer = KaldiRecognizer(self.model, 16000)
-            print("Vosk model loaded successfully")
+            print("French Vosk model loaded successfully")
         except Exception as e:
             print(f"Error loading Vosk model: {e}")
             self.model = None
             self.recognizer = None
 
+    def _initialize_commands(self):
+        """Initialize commands with their variants using canonical phrases."""
+        # Command mapping with actions
+        command_actions = {
+            "play": lambda: events.play_pause_signal.emit(),
+            "pause": lambda: events.play_pause_signal.emit(),
+            "forward": lambda: events.forward_signal.emit(),
+            "backward": lambda: events.rewind_signal.emit(),
+            "tag": lambda: events.add_tag_clicked.emit(),
+            "record": lambda: events.start_recording_clicked.emit(),
+            "stop_record": lambda: events.start_recording_clicked.emit(),
+            "live": lambda: events.live_mode_clicked.emit(),
+            "review": lambda: events.review_mode_clicked.emit(),
+            "open": lambda: events.open_video_clicked.emit(),
+            "goto_tag": lambda text: self._handle_goto_tag(text),
+        }
+
+        # Add commands using canonical phrases
+        for intent, phrases in CANONICAL_PHRASES.items():
+            if intent in command_actions:
+                # Get the main command text from INTENT_TO_COMMAND
+                main_phrase = INTENT_TO_COMMAND.get(intent, intent)
+                # Add the command with all its variants
+                self.command_matcher.add_command(
+                    command_id=intent,
+                    action=command_actions[intent],
+                    main_phrase=main_phrase,
+                    variants=phrases,
+                )
+
+    def _extract_tag_number(self, text: str) -> int | None:
+        """Extract a number (1–30) from digits or French words in text."""
+        text = text.lower()
+        # generate all the variants of the number in french
+        for i in range(1, 31):
+            variants = [
+                num2words(i, lang="fr"),
+                num2words(i, lang="fr").replace("-", " "),
+            ]
+            for v in variants:
+                if v in text:
+                    return i
+
+        return None
+
+    def _handle_goto_tag(self, text: str):
+        """Handle goto tag command."""
+        tag_number = self._extract_tag_number(text)
+        if tag_number is not None:
+            print(f"Navigating to tag number: {tag_number}")
+            events.request_tag_timestamp.emit(tag_number)
+        else:
+            print(f"No valid tag number found in: {text}")
+
+    def _handle_command(self, text):
+        """Handle recognized voice commands."""
+        text_lower = text.lower()
+        if not any(trigger in text_lower for trigger in TRIGGER_PHRASES):
+            return
+
+        # Try to match the command
+        best_command, similarity, action = self.command_matcher.match_command(text)
+        print(
+            f"{'Command recognized: ' + best_command if best_command else 'No matching command found for: ' + text} (score: {similarity:.2f})"
+        )
+
+        # Execute action if command found
+        if best_command:
+            if best_command == "goto_tag":
+                self._handle_goto_tag(text)
+            else:
+                action()
+
     def start(self):
         """Start the voice recognition service."""
         if self.is_running or not self.model:
             if not self.model:
-                print("Cannot start voice recognition: No model loaded")
+                print("Cannot start voice recognition: Model not loaded")
             return
 
         self.is_running = True
@@ -158,64 +266,16 @@ class VoiceService(QObject):
         while self.is_running:
             try:
                 data = self.audio_queue.get()
+
+                # Process with French model
                 if self.recognizer.AcceptWaveform(data):
                     result = json.loads(self.recognizer.Result())
                     if result.get("text"):
                         text = result["text"].lower()
                         print(f"Recognized text: {text}")
                         self._handle_command(text)
+
             except queue.Empty:
                 continue
             except Exception as e:
                 print(f"Error processing audio: {e}")
-
-    def _get_semantic_intent(self, text: str) -> str:
-        """
-        Get the semantic intent from the input text using TF-IDF and cosine similarity.
-
-        Args:
-            text: The input text to analyze
-
-        Returns:
-            The matched intent if similarity > 0.6, None otherwise
-        """
-        # Transform the input text
-        text_vector = self.vectorizer.transform([text])
-
-        # Calculate similarities with all phrases
-        similarities = cosine_similarity(text_vector, self.phrase_vectors)[0]
-
-        # Find the best match
-        best_idx = np.argmax(similarities)
-        best_similarity = similarities[best_idx]
-
-        if best_similarity > 0.6:  # Minimum threshold
-            best_phrase = self.all_phrases[best_idx]
-            best_intent = self.phrase_to_intent[best_phrase]
-            print(
-                f"Matched '{text}' to intent '{best_intent}' with similarity {best_similarity:.2f}"
-            )
-            print(f"Best matching phrase: '{best_phrase}'")
-            return best_intent
-
-        return None
-
-    def _handle_command(self, text):
-        """Handle recognized voice commands."""
-        # First try exact matching
-        for command, action in self.commands.items():
-            if command in text:
-                print(f"Executing exact match command: {command}")
-                action()
-                return
-
-        # If no exact match, try semantic matching
-        intent = self._get_semantic_intent(text)
-        if intent:
-            command = INTENT_TO_COMMAND.get(intent)
-            if command and command in self.commands:
-                print(f"Executing semantic match command: {command}")
-                self.commands[command]()
-                return
-
-        print(f"No matching command found for: {text}")

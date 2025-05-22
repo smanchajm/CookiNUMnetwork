@@ -15,8 +15,11 @@ mediamtx_path = os.path.join(workspace_root, "ressources", "mediamtx", "mediamtx
 mediamtx_config = os.path.join(workspace_root, "ressources", "mediamtx", "mediamtx.yml")
 streaming_rtmp_url = "rtmp://localhost:1935/live/stream"
 streaming_rtsp_url = "rtsp://localhost:8554/live/stream"
-audio_model_path = os.path.join(
+audio_model_path_fr = os.path.join(
     workspace_root, "ressources", "audio_model", "vosk-model-small-fr-0.22"
+)
+audio_model_path_us = os.path.join(
+    workspace_root, "ressources", "audio_model", "vosk-model-small-en-us-0.15"
 )
 
 
@@ -25,5 +28,7 @@ def get_ipv4_address():
     ip_address = socket.gethostbyname(hostname)
     return ip_address
 
+
+streaming_rtmp_url_gopro = f"rtmp://{get_ipv4_address()}:1935/live/stream"
 
 print("Test: get_ipv4_address", get_ipv4_address())

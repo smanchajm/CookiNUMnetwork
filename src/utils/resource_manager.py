@@ -24,7 +24,6 @@ class ResourceManager:
             Path: Chemin complet vers la ressource
         """
         try:
-            # Utilise importlib.resources pour obtenir le chemin de la ressource
             return importlib.resources.files("resources").joinpath(resource_name)
         except Exception as e:
             raise FileNotFoundError(f"Ressource non trouvée: {resource_name}") from e

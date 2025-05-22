@@ -103,6 +103,7 @@ class MainController:
         # Tag connections
         events.add_tag_clicked.connect(self._on_add_tag_clicked)
         events.tag_selected.connect(self.on_tag_selected)
+        events.request_tag_timestamp.connect(self._on_request_tag_timestamp)
 
     def _setup_media_connections(self):
         """Configure connections for media control."""
@@ -203,6 +204,23 @@ class MainController:
                 )
         else:
             self.tag_manager.add_tag_at_time(self.media_service.get_current_time()[0])
+
+    def _on_request_tag_timestamp(self, tag_number: int) -> None:
+        """
+        Handle request for tag timestamp from voice command.
+
+        Args:
+            tag_number: The requested tag number (1-based index)
+        """
+        tags = self.tag_manager.get_tags()
+        if tags and 0 <= tag_number - 1 < len(tags):
+            # Get the timestamp of the selected tag
+            timestamp = float(
+                tags[tag_number - 1][0]
+            )  # First element of the tuple is the timestamp
+            events.tag_selected.emit(str(timestamp))
+        else:
+            print(f"Tag number {tag_number} not found")
 
     def cleanup(self):
         """Clean up all resources before application shutdown."""

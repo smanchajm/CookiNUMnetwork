@@ -3,10 +3,42 @@ Canonical phrases for voice command recognition.
 These phrases are used for semantic matching of voice commands.
 """
 
+from src.core.event_handler import events
+
+# Trigger words that must be present in a command
+TRIGGER_PHRASES = ["logiciel", "application"]
+
+# Important words that give bonus to command matching
+IMPORTANT_WORDS = {
+    "ouvrir",
+    "play",
+    "pause",
+    "avancer",
+    "reculer",
+    "tag",
+    "enregistrer",
+    "direct",
+    "révision",
+}
+
+# Command actions mapping
+COMMAND_ACTIONS = {
+    "play": lambda: events.play_pause_signal.emit(),
+    "pause": lambda: events.play_pause_signal.emit(),
+    "forward": lambda: events.forward_signal.emit(),
+    "backward": lambda: events.rewind_signal.emit(),
+    "tag": lambda: events.add_tag_clicked.emit(),
+    "record": lambda: events.start_recording_clicked.emit(),
+    "stop_record": lambda: events.start_recording_clicked.emit(),
+    "live": lambda: events.live_mode_clicked.emit(),
+    "review": lambda: events.review_mode_clicked.emit(),
+    "open": lambda: events.open_video_clicked.emit(),
+    "goto_tag": lambda text: events.request_tag_timestamp.emit(text),
+}
+
 CANONICAL_PHRASES = {
     "play": [
         # French phrases
-        "lancer la vidéo",
         "démarrer la lecture",
         "commencer la lecture",
         "reprendre la lecture",
@@ -14,19 +46,21 @@ CANONICAL_PHRASES = {
         "mettre en lecture",
         "lancer le film",
         "démarrer le film",
-        "lancer le replay",
-        "démarrer le replay",
-        # English phrases
-        "play the video",
-        "start playing",
-        "resume the video",
-        "continue playing",
-        "play the movie",
-        "start the movie",
-        "play the replay",
-        "start the replay",
+        "lancer la lecture",
+        "démarrer la lecture",
+        "reprendre la lecture",
+        "continuer la lecture",
+        "mettre en lecture",
+        "démarre la lecture",
+        "démarre le film",
+        "démarre la lecture",
+        "démarre le film",
+        "démarre la lecture",
+        "démarre le film",
         # Simple words and verb variations
-        "play",
+        "lecture",
+        "lectures",
+        "lire",
         "jouer",
         "joue",
         "joues",
@@ -37,33 +71,23 @@ CANONICAL_PHRASES = {
         "lancer",
         "lance",
         "lances",
-        "go",
-        "aller",
-        "va",
-        "vas",
     ],
     "pause": [
         # French phrases
         "mettre en pause",
         "arrêter la lecture",
-        "stopper la vidéo",
+        "stopper",
         "stopper la lecture",
-        "stop la vidéo",
         "faire une pause",
         "interrompre la lecture",
         "mettre le film en pause",
         "arrêter le film",
         "stopper le film",
-        "mettre le replay en pause",
-        "arrêter le replay",
         # English phrases
         "pause the video",
-        "stop playing",
         "halt the video",
         "pause the movie",
         "stop the movie",
-        "pause the replay",
-        "stop the replay",
         # Simple words and verb variations
         "pause",
         "pauser",
@@ -86,13 +110,10 @@ CANONICAL_PHRASES = {
         "avancer",
         "aller en avant",
         "passer en avant",
-        "avancer la vidéo",
         "faire avancer",
         "passer à la suite",
         "avancer le film",
         "passer le film en avant",
-        "avancer le replay",
-        "passer le replay en avant",
         # English phrases
         "skip forward",
         "move forward",
@@ -103,7 +124,6 @@ CANONICAL_PHRASES = {
         "go ahead",
         "advance the movie",
         "skip the movie forward",
-        "advance the replay",
         # Simple words and verb variations
         "forward",
         "avancer",
@@ -120,13 +140,10 @@ CANONICAL_PHRASES = {
         "reculer",
         "aller en arrière",
         "passer en arrière",
-        "reculer la vidéo",
         "faire reculer",
         "revenir en arrière",
         "reculer le film",
         "passer le film en arrière",
-        "reculer le replay",
-        "passer le replay en arrière",
         # English phrases
         "go back",
         "move backward",
@@ -136,10 +153,10 @@ CANONICAL_PHRASES = {
         "move back",
         "rewind the movie",
         "skip the movie backward",
-        "rewind the replay",
         # Simple words and verb variations
         "back",
         "reculer",
+        "recul",
         "recule",
         "recules",
         "backward",
@@ -161,6 +178,13 @@ CANONICAL_PHRASES = {
         "créer un repère",
         "marquer un point",
         "ajouter un point de repère",
+        "ajoute un tag",
+        "ajoute un repère",
+        "ajoute un marqueur",
+        "ajoute un marqueur",
+        "ajoute un marqueur",
+        "ajoute un marqueur",
+        "ajoute un marqueur",
         # English phrases
         "add a tag",
         "create a tag",
@@ -173,7 +197,9 @@ CANONICAL_PHRASES = {
         "mark a point",
         "add a reference point",
         # Simple words and verb variations
+        "tags",
         "tag",
+        "tage",
         "tagger",
         "tag",
         "tagges",
@@ -214,6 +240,8 @@ CANONICAL_PHRASES = {
         "enregistrer",
         "enregistre",
         "enregistres",
+        "enregistrement",
+        "enregistrements",
         "capture",
         "capturer",
         "capture",
@@ -226,6 +254,10 @@ CANONICAL_PHRASES = {
     "stop_record": [
         # French phrases
         "arrêter l'enregistrement",
+        "arrête l'enregistrement",
+        "stop l'enregistrement",
+        "stop la capture",
+        "termine l'enregistrement",
         "stopper l'enregistrement",
         "terminer l'enregistrement",
         "arrêter la capture",
@@ -286,6 +318,8 @@ CANONICAL_PHRASES = {
         # Simple words and verb variations
         "live",
         "direct",
+        "directe",
+        "directes",
         "stream",
         "streaming",
     ],
@@ -301,13 +335,22 @@ CANONICAL_PHRASES = {
         "aller en révision",
         "activer la révision",
         "afficher la révision",
+        "passer en mode relecture",
+        "aller en mode relecture",
+        "activer le mode relecture",
+        "afficher le mode relecture",
+        "basculer en mode relecture",
+        "changer en mode relecture",
+        "passer en relecture",
+        "aller en relecture",
+        "activer la relecture",
+        "afficher la relecture",
         # English phrases
         "switch to review mode",
         "go to review mode",
         "enter review mode",
         "show review view",
         "activate review mode",
-        "display review mode",
         "switch to review",
         "go to review",
         "enter review",
@@ -315,13 +358,28 @@ CANONICAL_PHRASES = {
         # Simple words and verb variations
         "review",
         "révision",
-        "replay",
+        "révisione",
+        "réunion",
         "playback",
+        "visionnage",
+        "visionner",
+        "revisionner",
+        "revision",
+        "revisionnage",
+        "relecture",
+        "relire",
+        "relis",
+        "relisant",
+        "revoir",
+        "revois",
+        "revoyant",
     ],
     "open": [
         # French phrases
         "ouvrir un fichier",
         "ouvrir une vidéo",
+        "ouvre la vidéo",
+        "ouvre une vidéo",
         "charger un fichier",
         "charger une vidéo",
         "importer un fichier",
@@ -355,6 +413,24 @@ CANONICAL_PHRASES = {
         "importe",
         "importes",
     ],
+    "goto_tag": [
+        "aller au tag",
+        "aller à tag",
+        "aller au marqueur",
+        "aller à marqueur",
+        "aller au repère",
+        "aller à repère",
+        "aller au point",
+        "aller à point",
+        "naviguer au tag",
+        "naviguer à tag",
+        "naviguer au marqueur",
+        "naviguer à marqueur",
+        "naviguer au repère",
+        "naviguer à repère",
+        "naviguer au point",
+        "naviguer à point",
+    ],
 }
 
 # Mapping from semantic intents to actual commands
@@ -369,4 +445,5 @@ INTENT_TO_COMMAND = {
     "live": "mode direct",
     "review": "mode révision",
     "open": "ouvrir",
+    "goto_tag": "aller au tag",
 }

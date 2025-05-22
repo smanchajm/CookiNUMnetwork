@@ -24,7 +24,7 @@ class ActionButtonsSection(QWidget):
                 events.live_mode_clicked,
             ),
             (
-                "Mode Replay",
+                "Mode Relecture",
                 "review_mode_btn",
                 ResourceManager.get_icon_path("movie.svg"),
                 events.review_mode_clicked,

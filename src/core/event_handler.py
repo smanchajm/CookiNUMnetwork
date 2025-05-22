@@ -17,6 +17,9 @@ class EventHandler(QObject):
 
     # Tag management signals
     tags_updated = pyqtSignal(list)  # List of all tags
+    add_tag_clicked = pyqtSignal()
+    tag_selected = pyqtSignal(str)
+    request_tag_timestamp = pyqtSignal(int)  # Tag number requested by voice command
 
     # GoPro signals
     connected = pyqtSignal()
@@ -53,10 +56,6 @@ class EventHandler(QObject):
     connect_wifi_clicked = pyqtSignal()
     live_mode_clicked = pyqtSignal()
     review_mode_clicked = pyqtSignal()
-
-    # Sidebar tags signals
-    add_tag_clicked = pyqtSignal()
-    tag_selected = pyqtSignal(str)
 
     # Mode transition signals
     mode_changed = pyqtSignal(bool)  # bool: is_live_mode
