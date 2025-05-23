@@ -99,6 +99,9 @@ class MainController:
         events.connect_wifi_clicked.connect(self.dialog_service.show_wifi_dialog)
         events.live_mode_clicked.connect(self.mode_manager.toggle_live_mode)
         events.review_mode_clicked.connect(self.mode_manager.toggle_review_mode)
+        events.load_last_video_clicked.connect(
+            self.media_service.load_last_recorded_video
+        )
 
         # Tag connections
         events.add_tag_clicked.connect(self._on_add_tag_clicked)

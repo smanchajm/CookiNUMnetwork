@@ -57,6 +57,7 @@ class EventHandler(QObject):
     connect_wifi_clicked = pyqtSignal()
     live_mode_clicked = pyqtSignal()
     review_mode_clicked = pyqtSignal()
+    load_last_video_clicked = pyqtSignal()
 
     # Mode transition signals
     mode_changed = pyqtSignal(bool)  # bool: is_live_mode

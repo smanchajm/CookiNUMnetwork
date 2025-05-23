@@ -132,6 +132,7 @@ class VoiceService(QObject):
             "live": lambda: events.live_mode_clicked.emit(),
             "review": lambda: events.review_mode_clicked.emit(),
             "open": lambda: events.open_video_clicked.emit(),
+            "open_last_video": lambda: events.load_last_video_clicked.emit(),
             "goto_tag": lambda text: self._handle_goto_tag(text),
             "zoom": lambda: events.zoom_signal.emit(),
         }

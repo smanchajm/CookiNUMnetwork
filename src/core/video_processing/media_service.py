@@ -190,3 +190,30 @@ class MediaService(QObject):
             events.zoom_changed.emit(zoom_level)
             return zoom_level
         return 1.0
+
+    def load_last_recorded_video(self):
+        """
+        Load the most recently recorded video from the video files directory.
+        """
+        if not os.path.exists(video_files_path):
+            events.media_error.emit(f"Le dossier {video_files_path} n'existe pas.")
+            return None
+
+        # Get all video files in the directory
+        video_files = []
+        for file in os.listdir(video_files_path):
+            if file.lower().endswith((".mp4", ".avi", ".mkv", ".mov")):
+                file_path = os.path.join(video_files_path, file)
+                video_files.append((file_path, os.path.getmtime(file_path)))
+
+        if not video_files:
+            events.media_error.emit(
+                "Aucune vidéo trouvée dans le dossier d'enregistrement."
+            )
+            return None
+
+        # Sort by modification time (most recent first)
+        video_files.sort(key=lambda x: x[1], reverse=True)
+        latest_video = video_files[0][0]
+        events.media_loaded.emit(latest_video)
+        return latest_video

@@ -411,6 +411,14 @@ CANONICAL_PHRASES = {
         "importe",
         "importes",
     ],
+    "open_last_video": [
+        "ouvrir la dernière vidéo",
+        "ouvrir dernière vidéo",
+        "charger dernière vidéo",
+        "charger la dernière vidéo",
+        "dernière vidéo",
+        "dernier enregistrement",
+    ],
     "goto_tag": [
         "aller au tag",
         "aller à tag",

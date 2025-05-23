@@ -39,6 +39,12 @@ class ActionButtonsSection(QWidget):
                 events.open_video_clicked,
             ),
             (
+                "Ouvrir dernière vidéo",
+                "load_last_video_btn",
+                ResourceManager.get_icon_path("history.svg"),
+                events.load_last_video_clicked,
+            ),
+            (
                 "Enregistrer",
                 "start_recording_btn",
                 ResourceManager.get_icon_path("radio_button_checked.svg"),
@@ -66,6 +72,7 @@ class ActionButtonsSection(QWidget):
         ]
         self.review_mode_buttons = [
             "open_video_btn",
+            "load_last_video_btn",
         ]
 
         self.buttons = {}
