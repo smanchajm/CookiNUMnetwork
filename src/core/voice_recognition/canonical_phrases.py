@@ -108,7 +108,6 @@ CANONICAL_PHRASES = {
     "forward": [
         # French phrases
         "avancer",
-        "aller en avant",
         "passer en avant",
         "faire avancer",
         "passer à la suite",
@@ -138,7 +137,6 @@ CANONICAL_PHRASES = {
     "backward": [
         # French phrases
         "reculer",
-        "aller en arrière",
         "passer en arrière",
         "faire reculer",
         "revenir en arrière",

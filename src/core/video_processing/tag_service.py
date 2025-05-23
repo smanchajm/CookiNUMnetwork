@@ -126,9 +126,7 @@ class TagService:
         return self._tags.copy()
 
     def clear_tags(self) -> None:
-        """
-        Réinitialise la liste des tags sans sauvegarder
-        """
+
         self._tags = []
         events.tags_updated.emit(self._tags)
 
@@ -137,5 +135,10 @@ class TagService:
         Réinitialise la liste des tags et sauvegarde le fichier vide
         """
         self._tags = []
+        self.save_tags()
+        events.tags_updated.emit(self._tags)
+
+    def delete_tag(self, timestamp: str) -> None:
+        self._tags = [tag for tag in self._tags if tag[0] != timestamp]
         self.save_tags()
         events.tags_updated.emit(self._tags)

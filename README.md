@@ -36,6 +36,33 @@ pip install -r requirements.txt
 - Système de tagging vidéo
 - Raccourcis clavier pour un contrôle rapide
 
+## 🎤 Commandes vocales
+
+Pour utiliser les commandes vocales, commencez toujours par dire "application" ou "logiciel". Voici les commandes disponibles :
+
+Commande vocale : action associée
+
+### Contrôle de la lecture
+- "application lecture" : lecture
+- "application pause" : Pause
+- "application avancer" : Avancer
+- "application reculer" : Reculer
+
+### Modes
+- "application mode direct" : Mode direct
+- "application mode relecture" : Mode révision
+
+### Enregistrement
+- "application démarrer enregistrement" : Démarrer l'enregistrement
+- "application arrêter enregistrement" : Arrêter l'enregistrement
+
+### Tags
+- "application ajouter un tag" : Ajouter un tag à la position actuelle
+- "application naviguer au tag [numéro]" : N au tag spécifié (ex: "application aller au tag vingt")
+
+### Fichiers
+- "application ouvrir une vidéo" : Ouvrir un fichier vidéo
+
 ## ⌨️ Raccourcis clavier
 
 L'application propose plusieurs raccourcis clavier pour faciliter son utilisation :

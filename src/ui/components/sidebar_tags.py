@@ -4,10 +4,10 @@ from PyQt6.QtWidgets import (
     QScrollArea,
     QSpacerItem,
     QSizePolicy,
+    QHBoxLayout,
 )
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QSize
 
-from src.core.video_processing.tag_service import TagService
 from src.ui.widgets.action_button import ActionButton
 from src.ui.utils.layouts import create_vbox_layout
 from src.ui.utils.qt_helpers import clear_layout
@@ -60,14 +60,8 @@ class TagListSection(QWidget):
             spacing=0,
             margins=(0, 0, 0, 0),
         )
-        main_layout.setStretchFactor(self.tag_scroll_area, 1)
 
         self.setLayout(main_layout)
-        self.update_tag_display(None)
-
-    def on_tags_changed(self, new_tags_data):
-        """Handle tags data changes."""
-        self.update_tag_display(new_tags_data)
 
     def update_tag_display(self, tags: list[tuple[str, str, str]]):
         """Clears and repopulates the tag list display."""
@@ -78,16 +72,47 @@ class TagListSection(QWidget):
             tag_label.setObjectName("tag_item_label")
             self.tags_layout.addWidget(tag_label)
         else:
-            for timestamp, name, display_time in tags:  # Déballage du tuple
+            # Calculer la largeur maximale nécessaire
+            max_width = 0
+            tag_labels = []
+
+            # Première passe : créer tous les labels et trouver la largeur maximale
+            for timestamp, name, display_time in tags:
                 tag_label = QLabel(f"{display_time}  {name}")
                 tag_label.setObjectName("tag_item_label")
-
-                # Rendre les tags cliquables
                 tag_label.setCursor(Qt.CursorShape.PointingHandCursor)
                 tag_label.mousePressEvent = (
                     lambda event, ts=timestamp: self._on_tag_item_clicked(ts)
                 )
-                self.tags_layout.addWidget(tag_label)
+                tag_labels.append((tag_label, timestamp))
+                max_width = max(max_width, tag_label.sizeHint().width())
+
+            # Deuxième passe : appliquer la largeur maximale et ajouter les widgets
+            for tag_label, timestamp in tag_labels:
+                tag_label.setFixedWidth(max_width)
+
+                # Créer un widget horizontal pour contenir le label et le bouton
+                tag_widget = QWidget()
+                tag_layout = QHBoxLayout(tag_widget)
+                tag_layout.setContentsMargins(0, 0, 0, 0)
+                tag_layout.setSpacing(5)
+
+                # Créer le bouton de suppression
+                delete_button = ActionButton(
+                    icon_path=ResourceManager.get_icon_path("delete.svg")
+                )
+                delete_button.setObjectName("delete_tag_button")
+                delete_button.clicked.connect(
+                    lambda checked, ts=timestamp: self._on_delete_tag_clicked(ts)
+                )
+
+                # Ajouter les widgets au layout horizontal
+                tag_layout.addWidget(tag_label)
+                tag_layout.addWidget(delete_button)
+                tag_layout.addStretch()
+
+                # Ajouter le widget horizontal au layout principal
+                self.tags_layout.addWidget(tag_widget)
 
         # Add stretch at the end
         self.tags_layout.addStretch(1)
@@ -95,6 +120,10 @@ class TagListSection(QWidget):
     def _on_tag_item_clicked(self, timestamp):
         """Handle tag item click event."""
         events.tag_selected.emit(timestamp)
+
+    def _on_delete_tag_clicked(self, timestamp):
+        """Handle delete tag button click event."""
+        events.delete_tag.emit(timestamp)
 
     def set_tags(self, new_tags_data: list[tuple[str, str]]):
         """Updates the tags data and refreshes the display."""

@@ -20,6 +20,7 @@ class EventHandler(QObject):
     add_tag_clicked = pyqtSignal()
     tag_selected = pyqtSignal(str)
     request_tag_timestamp = pyqtSignal(int)  # Tag number requested by voice command
+    delete_tag = pyqtSignal(str)
 
     # GoPro signals
     connected = pyqtSignal()

@@ -104,6 +104,7 @@ class MainController:
         events.add_tag_clicked.connect(self._on_add_tag_clicked)
         events.tag_selected.connect(self.on_tag_selected)
         events.request_tag_timestamp.connect(self._on_request_tag_timestamp)
+        events.delete_tag.connect(self._on_delete_tag)
 
     def _setup_media_connections(self):
         """Configure connections for media control."""
@@ -155,7 +156,7 @@ class MainController:
 
         # Tag connections
         events.tags_updated.connect(
-            self.main_window.sidebar.tag_section.on_tags_changed
+            self.main_window.sidebar.tag_section.update_tag_display
         )
         events.tags_updated.connect(
             self.main_window.media_player.replay_section.controls.on_tags_changed
@@ -221,6 +222,10 @@ class MainController:
             events.tag_selected.emit(str(timestamp))
         else:
             print(f"Tag number {tag_number} not found")
+
+    def _on_delete_tag(self, timestamp: str) -> None:
+        """Handle tag deletion."""
+        self.tag_manager.delete_tag(timestamp)
 
     def cleanup(self):
         """Clean up all resources before application shutdown."""
