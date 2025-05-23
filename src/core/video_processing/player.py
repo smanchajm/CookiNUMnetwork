@@ -130,6 +130,8 @@ class VLCPlayer(Player):
         self.media_player = self.vlc_instance.media_player_new()
         self.playback_speed = 1.0
         self.speed_levels = [0.25, 0.5, 0.75, 1.0]
+        self.zoom_level = 1.0
+        self.zoom_levels = [1.0, 1.5]
 
     def load(self, media_path):
         try:
@@ -194,6 +196,30 @@ class VLCPlayer(Player):
             self.media_player.set_hwnd(win_id)
         elif sys.platform == "darwin":
             self.media_player.set_nsobject(int(win_id))
+
+    def set_zoom(self, zoom_level):
+        """
+        Set the zoom level for the video.
+        """
+        if zoom_level in self.zoom_levels:
+            self.zoom_level = zoom_level
+            self.media_player.video_set_scale(zoom_level)
+        return self.zoom_level
+
+    def cycle_zoom(self):
+        """
+        Cycle through available zoom levels.
+
+        Returns:
+            float: The new zoom level.
+        """
+        try:
+            current_index = self.zoom_levels.index(self.zoom_level)
+        except ValueError:
+            current_index = 0
+
+        next_index = (current_index + 1) % len(self.zoom_levels)
+        return self.set_zoom(self.zoom_levels[next_index])
 
 
 class OpenCVPlayer(Player):

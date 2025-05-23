@@ -429,6 +429,16 @@ CANONICAL_PHRASES = {
         "naviguer au point",
         "naviguer à point",
     ],
+    "zoom": [
+        "zoomer",
+        "zoomer en avant",
+        "zoomer en arrière",
+        "zoomer en avant",
+        "zoomer en arrière",
+        "zoom",
+        "agrandir",
+        "agrandis",
+    ],
 }
 
 # Mapping from semantic intents to actual commands

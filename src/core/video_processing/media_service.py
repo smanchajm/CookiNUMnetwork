@@ -170,3 +170,23 @@ class MediaService(QObject):
         """Toggle the loop state of the player."""
         self.loop_enabled = not self.loop_enabled
         return self.loop_enabled
+
+    def cycle_zoom(self):
+        """
+        Cycle through available zoom levels.
+        """
+        if hasattr(self.player, "cycle_zoom"):
+            zoom_level = self.player.cycle_zoom()
+            events.zoom_changed.emit(zoom_level)
+            return zoom_level
+        return 1.0
+
+    def set_zoom(self, zoom_level):
+        """
+        Set a specific zoom level.
+        """
+        if hasattr(self.player, "set_zoom"):
+            zoom_level = self.player.set_zoom(zoom_level)
+            events.zoom_changed.emit(zoom_level)
+            return zoom_level
+        return 1.0

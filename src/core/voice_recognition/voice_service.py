@@ -133,6 +133,7 @@ class VoiceService(QObject):
             "review": lambda: events.review_mode_clicked.emit(),
             "open": lambda: events.open_video_clicked.emit(),
             "goto_tag": lambda text: self._handle_goto_tag(text),
+            "zoom": lambda: events.zoom_signal.emit(),
         }
 
         # Add commands using canonical phrases

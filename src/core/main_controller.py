@@ -114,6 +114,7 @@ class MainController:
         events.forward_signal.connect(lambda: self.media_service.forward(10))
         events.seek_signal.connect(self.media_service.seek)
         events.slow_down_signal.connect(self.media_service.slow_down)
+        events.zoom_signal.connect(self.media_service.cycle_zoom)
 
         events.position_changed.connect(
             self.main_window.media_player.on_position_changed

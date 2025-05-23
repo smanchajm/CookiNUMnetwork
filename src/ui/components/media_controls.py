@@ -87,6 +87,9 @@ class MediaControls(QWidget):
         self.slow_down_btn = ActionButton(
             icon_path=ResourceManager.get_icon_path("slow_motion_video.svg"),
         )
+        self.zoom_btn = ActionButton(
+            icon_path=ResourceManager.get_icon_path("zoom_in.svg"),
+        )
 
         self.timeline_label = QLabel("00:00/00:00")
 
@@ -100,6 +103,7 @@ class MediaControls(QWidget):
                 self.rewind_btn,
                 self.play_pause_btn,
                 self.forward_btn,
+                self.zoom_btn,
                 self.timeline_label,
             ],
             spacing=5,
@@ -120,6 +124,7 @@ class MediaControls(QWidget):
         self.rewind_btn.clicked.connect(events.rewind_signal.emit)
         self.play_pause_btn.clicked.connect(self.toggle_play)
         self.forward_btn.clicked.connect(events.forward_signal.emit)
+        self.zoom_btn.clicked.connect(events.zoom_signal.emit)
         self.progress_slider.valueChanged.connect(self.on_slider_value_changed)
         events.position_changed.connect(self.update_timeline)
         events.play_state_changed.connect(self.on_play_state_changed)
