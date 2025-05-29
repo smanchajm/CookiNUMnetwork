@@ -429,6 +429,20 @@ CANONICAL_PHRASES = {
         "agrandir",
         "agrandis",
     ],
+    "zoom_in": [
+        "agrandir",
+        "agrandis",
+        "agrandi",
+        "agrandie" "agrandir la vidéo",
+        "agrandis la vidéo",
+        "agrandi la vidéo",
+    ],
+    "zoom_out": [
+        "réduire",
+        "rédui la vidéo",
+        "réduit la vidéo",
+        "réduis la vidéo",
+    ],
 }
 
 # Mapping from semantic intents to actual commands

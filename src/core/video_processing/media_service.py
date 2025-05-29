@@ -177,20 +177,21 @@ class MediaService(QObject):
         Cycle through available zoom levels.
         """
         if hasattr(self.player, "cycle_zoom"):
-            zoom_level = self.player.cycle_zoom()
-            events.zoom_changed.emit(zoom_level)
-            return zoom_level
-        return 1.0
+            self.player.cycle_zoom()
 
-    def set_zoom(self, zoom_level):
+    def zoom_in(self):
         """
-        Set a specific zoom level.
+        Zoom in the video.
         """
-        if hasattr(self.player, "set_zoom"):
-            zoom_level = self.player.set_zoom(zoom_level)
-            events.zoom_changed.emit(zoom_level)
-            return zoom_level
-        return 1.0
+        if hasattr(self.player, "zoom_in"):
+            self.player.zoom_in()
+
+    def zoom_out(self):
+        """
+        Zoom out the video.
+        """
+        if hasattr(self.player, "zoom_out"):
+            self.player.zoom_out()
 
     def load_last_recorded_video(self):
         """

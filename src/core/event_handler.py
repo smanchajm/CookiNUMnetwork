@@ -79,8 +79,9 @@ class EventHandler(QObject):
     application_closing = pyqtSignal()
 
     # Zoom signals
-    zoom_signal = pyqtSignal()
-    zoom_changed = pyqtSignal(float)
+    cycle_zoom_signal = pyqtSignal()
+    zoom_in_signal = pyqtSignal()
+    zoom_out_signal = pyqtSignal()
 
     def __new__(cls):
         if cls._instance is None:

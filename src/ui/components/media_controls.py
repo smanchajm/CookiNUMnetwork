@@ -124,7 +124,7 @@ class MediaControls(QWidget):
         self.rewind_btn.clicked.connect(events.rewind_signal.emit)
         self.play_pause_btn.clicked.connect(self.toggle_play)
         self.forward_btn.clicked.connect(events.forward_signal.emit)
-        self.zoom_btn.clicked.connect(events.zoom_signal.emit)
+        self.zoom_btn.clicked.connect(events.cycle_zoom_signal.emit)
         self.progress_slider.valueChanged.connect(self.on_slider_value_changed)
         events.position_changed.connect(self.update_timeline)
         events.play_state_changed.connect(self.on_play_state_changed)

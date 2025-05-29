@@ -134,7 +134,7 @@ class VLCPlayer(Player):
         self.playback_speed = 1.0
         self.speed_levels = [0.25, 0.5, 0.75, 1.0]
         self.zoom_level = 1.0
-        self.zoom_levels = [0, 2.0]
+        self.zoom_levels = [0, 2.0, 4.0]
 
     def load(self, media_path):
         try:
@@ -227,6 +227,24 @@ class VLCPlayer(Player):
 
         next_index = (current_index + 1) % len(self.zoom_levels)
         return self.set_zoom(self.zoom_levels[next_index])
+
+    def zoom_in(self):
+        try:
+            current_index = self.zoom_levels.index(self.zoom_level)
+            if current_index < len(self.zoom_levels) - 1:
+                self.set_zoom(self.zoom_levels[current_index + 1])
+        except ValueError:
+            # If current zoom level not found in list, set to first zoom level
+            self.set_zoom(self.zoom_levels[0])
+
+    def zoom_out(self):
+        try:
+            current_index = self.zoom_levels.index(self.zoom_level)
+            if current_index > 0:
+                self.set_zoom(self.zoom_levels[current_index - 1])
+        except ValueError:
+            # If current zoom level not found in list, set to first zoom level
+            self.set_zoom(self.zoom_levels[0])
 
 
 class OpenCVPlayer(Player):
