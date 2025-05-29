@@ -1,12 +1,14 @@
 import time
-from PyQt6.QtWidgets import QFrame, QLabel, QPushButton
-from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QFrame, QLabel
+from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
+from PyQt6.QtCore import Qt, QUrl
 import os
 
 from src.ui.utils.layouts import create_vbox_layout
 from src.core.video_processing.player import VLCPlayer
 from src.core.constants import streaming_rtsp_url
 from src.core.logging_config import logger
+from src.utils.resource_manager import ResourceManager
 
 
 class MediaLiveSection(QFrame):
@@ -22,13 +24,19 @@ class MediaLiveSection(QFrame):
 
         # Initialiser le lecteur VLC
         self.player = VLCPlayer()
-        self.player.options = [
+        self.player.media_player.options = [
             "--rtsp-udp",
             "--no-rtsp-tcp",
             "--network-caching=50",  # 50 ms de buffer réseau
             "--no-drop-late-frames",
             "--no-skip-frames",
+            "--no-audio",
         ]
+
+        # audio player
+        self.audio_player = QMediaPlayer()
+        self.audio_output = QAudioOutput()
+        self.audio_player.setAudioOutput(self.audio_output)
 
         self.setup_ui()
 
@@ -54,7 +62,6 @@ class MediaLiveSection(QFrame):
             "1. Renseignez le wifi\n"
             "2. Connectez-vous à la GoPro via WiFi\n"
         )
-        self.instructions_label.raise_()
 
         # Créer le layout
         main_layout = create_vbox_layout(
@@ -72,7 +79,7 @@ class MediaLiveSection(QFrame):
         logger.info("on_streaming_started")
         self.player.load(streaming_rtsp_url)
         if self.video_frame.winId():
-            logger.info("Test: on_streaming_started", self.video_frame.winId())
+            logger.info("Test: on_streaming_started")
         self.player.set_video_output(self.video_frame.winId())
         self.player.play()
 
@@ -86,10 +93,15 @@ class MediaLiveSection(QFrame):
         """Update display based on connection state."""
         self.instructions_label.setVisible(not self.is_rtmp_connected)
 
-    def set_recording_indicator(self, visible: bool):
-        """Show or hide the recording indicator overlay."""
-        self.recording_indicator.setVisible(visible)
+    def on_recording_state_changed(self, is_recording: bool):
+        """Show or hide the recording indicator overlay and play sound."""
+        self.recording_indicator.setVisible(is_recording)
         self.recording_indicator.raise_()
+
+        # Play recording start sound
+        sound_path = ResourceManager.get_sound_path("recording_sound.wav")
+        self.audio_player.setSource(QUrl.fromLocalFile(str(sound_path)))
+        self.audio_player.play()
 
     def resizeEvent(self, event):
         """Resize video widget when window is resized."""

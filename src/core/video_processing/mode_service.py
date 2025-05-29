@@ -6,8 +6,11 @@ Handles transitions between different modes and notifies concerned components.
 from enum import Enum, auto
 from typing import Callable, List
 
+from playsound import playsound
+
 from src.core.event_handler import events
 from src.core.logging_config import logger
+from src.utils.resource_manager import ResourceManager
 
 
 class Mode(Enum):
@@ -79,4 +82,5 @@ class ModeService:
 
     def toggle_review_mode(self) -> None:
         """Switch to review mode."""
+
         self.set_mode(Mode.REVIEW)

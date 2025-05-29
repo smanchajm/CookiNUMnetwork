@@ -8,6 +8,7 @@ qt_material==2.14
 opencv-python>=4.8.0
 python-vlc>=3.0.18122
 av>=10.0.0
+playsound==1.3.0
 
 # Voice Recognition
 vosk==0.3.45

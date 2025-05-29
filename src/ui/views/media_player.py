@@ -55,11 +55,3 @@ class MediaPlayer(QFrame):
         else:
             self.live_section.hide()
             self.replay_section.show()
-
-    def set_recording_indicator(self, visible: bool) -> None:
-        """Show or hide the recording indicator overlay."""
-        self.live_section.set_recording_indicator(visible)
-
-    def update_recording_state(self, is_recording: bool) -> None:
-        """Show or hide the recording indicator with icon."""
-        self.set_recording_indicator(is_recording)

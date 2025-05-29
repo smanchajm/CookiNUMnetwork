@@ -53,7 +53,6 @@ class MainController:
 
         # Initialize services after all connections are established
         self.mode_manager.initialize()
-        events.recording_state_changed.emit(self.recording_service.is_recording)
         self.gopro_service.start_streaming()
         logger.info("Starting voice service")
         self.voice_service.start()
@@ -154,7 +153,7 @@ class MainController:
             self.main_window.sidebar.action_section.update_recording_state
         )
         events.recording_state_changed.connect(
-            self.main_window.media_player.update_recording_state
+            self.main_window.media_player.live_section.on_recording_state_changed
         )
         # Update video path when recording starts/stops
         events.recording_state_changed.connect(self._on_recording_state_changed)

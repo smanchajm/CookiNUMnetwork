@@ -95,6 +95,13 @@ class ResourceManager:
         return ResourceManager.get_resource_path(f"images/{image_name}")
 
     @staticmethod
+    def get_sound_path(sound_name: str) -> Path:
+        """
+        Obtient le chemin vers un son.
+        """
+        return ResourceManager.get_resource_path(f"sounds/{sound_name}")
+
+    @staticmethod
     def get_font_path(font_name: str) -> Path:
         """
         Obtient le chemin vers une police.

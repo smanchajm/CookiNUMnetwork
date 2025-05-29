@@ -1,5 +1,4 @@
 from PyQt6.QtCore import pyqtSignal, QObject
-from src.core.constants import logger
 
 
 class EventHandler(QObject):
