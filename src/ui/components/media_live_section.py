@@ -6,6 +6,7 @@ import os
 from src.ui.utils.layouts import create_vbox_layout
 from src.core.video_processing.player import VLCPlayer
 from src.core.constants import streaming_rtsp_url
+from src.core.logging_config import logger
 
 
 class MediaLiveSection(QFrame):
@@ -63,16 +64,15 @@ class MediaLiveSection(QFrame):
 
     def on_streaming_started(self):
         """Handle streaming start."""
-        print("on_streaming_started")
         time.sleep(3)  # buffer
         self.is_rtmp_connected = True
         self._update_display()
 
         # Configurer le lecteur pour lire le flux rtsp (moins de latence)
-        print("Test: on_streaming_started", streaming_rtsp_url)
+        logger.info("on_streaming_started")
         self.player.load(streaming_rtsp_url)
         if self.video_frame.winId():
-            print("Test: on_streaming_started", self.video_frame.winId())
+            logger.info("Test: on_streaming_started", self.video_frame.winId())
         self.player.set_video_output(self.video_frame.winId())
         self.player.play()
 

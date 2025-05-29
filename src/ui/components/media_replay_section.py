@@ -1,6 +1,5 @@
 from PyQt6.QtWidgets import QFrame
 
-from src.core.video_processing.media_service import MediaService
 from src.ui.components.media_controls import MediaControls
 from src.ui.utils.layouts import create_vbox_layout
 from src.utils.resource_manager import ResourceManager
@@ -31,7 +30,6 @@ class MediaReplaySection(QFrame):
         self.setLayout(main_layout)
 
     def on_play_state_changed(self, is_playing):
-        print(f"on_play_state_changed: {is_playing}")
         if is_playing:
             self.controls.play_pause_btn._setup_icon(
                 ResourceManager.get_icon_path("pause.svg")

@@ -39,7 +39,7 @@ class ActionButtonsSection(QWidget):
                 events.open_video_clicked,
             ),
             (
-                "Ouvrir dernière vidéo",
+                "Lire la dernière vidéo",
                 "load_last_video_btn",
                 ResourceManager.get_icon_path("history.svg"),
                 events.load_last_video_clicked,

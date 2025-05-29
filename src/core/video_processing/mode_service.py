@@ -1,16 +1,17 @@
 """
-Service de gestion des modes de l'application (Live/Review).
-Gère les transitions entre les différents modes et notifie les composants concernés.
+Service for managing application modes (Live/Review).
+Handles transitions between different modes and notifies concerned components.
 """
 
 from enum import Enum, auto
 from typing import Callable, List
 
 from src.core.event_handler import events
+from src.core.logging_config import logger
 
 
 class Mode(Enum):
-    """États possibles de l'application."""
+    """Possible application states."""
 
     REVIEW = auto()
     LIVE = auto()
@@ -18,8 +19,8 @@ class Mode(Enum):
 
 class ModeService:
     """
-    Gestionnaire des modes de l'application.
-    Implémente une machine à états simple pour gérer les transitions entre modes.
+    Application mode manager.
+    Implements a simple state machine to handle mode transitions.
     """
 
     def __init__(self):
@@ -28,18 +29,18 @@ class ModeService:
 
     def initialize(self) -> None:
         """
-        Initialise le service et notifie les observateurs du mode par défaut.
+        Initialize the service and notify observers of the default mode.
         """
-        # Notifier les observateurs du mode initial
-        print(f"Test: ModeService initialized {self.is_live_mode}")
+        # Notify observers of initial mode
+        logger.info(f"ModeService initialized with live mode: {self.is_live_mode}")
         events.live_mode_changed.emit(self.is_live_mode)
 
     def set_mode(self, new_mode: Mode) -> None:
         """
-        Change le mode de l'application.
+        Change the application mode.
 
         Args:
-            new_mode: Le nouveau mode à activer.
+            new_mode: The new mode to activate.
         """
         if new_mode == self._mode:
             return
@@ -47,35 +48,35 @@ class ModeService:
         old_mode = self._mode
         self._mode = new_mode
 
-        # Notifier les callbacks de transition
+        # Notify transition callbacks
         for callback in self._transition_callbacks:
             callback(old_mode, new_mode)
 
-        # Émettre le signal global
+        # Emit global signal
         events.live_mode_changed.emit(self.is_live_mode)
 
     def get_mode(self) -> Mode:
-        """Retourne le mode actuel."""
+        """Return the current mode."""
         return self._mode
 
     @property
     def is_live_mode(self) -> bool:
-        """Indique si l'application est en mode live."""
+        """Indicates if the application is in live mode."""
         return self._mode == Mode.LIVE
 
     def add_transition_callback(self, callback: Callable[[Mode, Mode], None]) -> None:
         """
-        Ajoute un callback qui sera appelé lors d'un changement de mode.
+        Add a callback that will be called when mode changes.
 
         Args:
-            callback: Fonction appelée avec (ancien_mode, nouveau_mode).
+            callback: Function called with (old_mode, new_mode).
         """
         self._transition_callbacks.append(callback)
 
     def toggle_live_mode(self) -> None:
-        """Bascule vers le mode live."""
+        """Switch to live mode."""
         self.set_mode(Mode.LIVE)
 
     def toggle_review_mode(self) -> None:
-        """Bascule vers le mode review."""
+        """Switch to review mode."""
         self.set_mode(Mode.REVIEW)

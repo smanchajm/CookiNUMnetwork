@@ -3,14 +3,15 @@ from PyQt6.QtWidgets import QFileDialog
 import os
 
 from src.core.constants import video_files_path
+from src.core.logging_config import logger
 from src.core.video_processing.player import Player
 from src.core.event_handler import events
 
 
 class MediaService(QObject):
     """
-    Service de gestion des médias qui gère la logique d'ouverture de fichiers et de lecture.
-    Sépare la logique métier de l'interface utilisateur.
+    Media management service that handles file opening and playback logic.
+    Separates business logic from the user interface.
     """
 
     def __init__(self, player: Player, parent=None):
@@ -21,7 +22,7 @@ class MediaService(QObject):
         self.current_video_path = None
         self.total_time = 0  # Store total time as class attribute
 
-        # Timer pour mettre à jour la position
+        # Timer to update position
         self.timer = QTimer(self)
         self.timer.setInterval(100)
         self.timer.timeout.connect(self._update_position)
@@ -50,7 +51,7 @@ class MediaService(QObject):
                 events.media_loaded.emit(file_path)
                 return file_path
             else:
-                error_msg = f"Le fichier {file_path} n'existe pas."
+                error_msg = f"File {file_path} does not exist."
                 events.media_error.emit(error_msg)
                 return None
 
@@ -66,7 +67,7 @@ class MediaService(QObject):
             return True
         else:
             self.pause()
-            events.media_error.emit(f"Impossible de charger le fichier: {path}")
+            events.media_error.emit(f"Unable to load file: {path}")
             return False
 
     def _get_total_time(self):
@@ -75,7 +76,7 @@ class MediaService(QObject):
         if total_time > 0:
             self.total_time = total_time
             events.media_loaded_total_time.emit(total_time)
-            print(f"Total time set: {total_time}")
+            logger.info(f"Total time set: {total_time}")
         else:
             # If still not available, try again
             QTimer.singleShot(500, self._get_total_time)
@@ -147,8 +148,8 @@ class MediaService(QObject):
 
     def set_video_output(self, win_id):
         """
-        Configure la sortie vidéo pour le player.
-        Cette méthode est spécifique à chaque implémentation de Player.
+        Configure video output for the player.
+        This method is specific to each Player implementation.
         """
         if hasattr(self.player, "set_video_output"):
             self.player.set_video_output(win_id)
@@ -196,20 +197,18 @@ class MediaService(QObject):
         Load the most recently recorded video from the video files directory.
         """
         if not os.path.exists(video_files_path):
-            events.media_error.emit(f"Le dossier {video_files_path} n'existe pas.")
+            events.media_error.emit(f"Directory {video_files_path} does not exist.")
             return None
 
         # Get all video files in the directory
         video_files = []
         for file in os.listdir(video_files_path):
-            if file.lower().endswith((".mp4", ".avi", ".mkv", ".mov")):
+            if file.lower().endswith((".mp4")):
                 file_path = os.path.join(video_files_path, file)
                 video_files.append((file_path, os.path.getmtime(file_path)))
 
         if not video_files:
-            events.media_error.emit(
-                "Aucune vidéo trouvée dans le dossier d'enregistrement."
-            )
+            events.media_error.emit("No videos found in the recording directory.")
             return None
 
         # Sort by modification time (most recent first)

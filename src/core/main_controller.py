@@ -10,6 +10,7 @@ from src.core.voice_recognition.voice_service import VoiceService
 from src.ui.dialogs.dialog_service import DialogService
 from src.core.event_handler import events
 from src.core.keyboard_shortcuts_service import KeyboardShortcutsService
+from src.core.logging_config import logger
 
 
 class MainController:
@@ -54,9 +55,9 @@ class MainController:
         self.mode_manager.initialize()
         events.recording_state_changed.emit(self.recording_service.is_recording)
         self.gopro_service.start_streaming()
-        print("Starting voice service")
+        logger.info("Starting voice service")
         self.voice_service.start()
-        print("Voice service started")
+        logger.info("Voice service started")
 
     def setup_connections(self):
         """Configure all signal connections between components."""
@@ -107,7 +108,7 @@ class MainController:
         events.add_tag_clicked.connect(self._on_add_tag_clicked)
         events.tag_selected.connect(self.on_tag_selected)
         events.request_tag_timestamp.connect(self._on_request_tag_timestamp)
-        events.delete_tag.connect(self._on_delete_tag)
+        events.delete_tag.connect(self.tag_manager.delete_tag)
 
     def _setup_media_connections(self):
         """Configure connections for media control."""
@@ -225,15 +226,11 @@ class MainController:
             )  # First element of the tuple is the timestamp
             events.tag_selected.emit(str(timestamp))
         else:
-            print(f"Tag number {tag_number} not found")
-
-    def _on_delete_tag(self, timestamp: str) -> None:
-        """Handle tag deletion."""
-        self.tag_manager.delete_tag(timestamp)
+            logger.warning(f"Tag number {tag_number} not found")
 
     def cleanup(self):
         """Clean up all resources before application shutdown."""
-        print("Test: Application closing, cleaning up resources...")
+        logger.info("Application closing, cleaning up resources...")
 
         if hasattr(self, "recording_service"):
             self.recording_service.cleanup()
@@ -244,4 +241,4 @@ class MainController:
         if hasattr(self, "voice_service"):
             self.voice_service.stop()
 
-        print("Test: Cleanup completed")
+        logger.info("Cleanup completed")

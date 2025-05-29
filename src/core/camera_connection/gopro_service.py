@@ -4,6 +4,7 @@ from PyQt6.QtCore import QObject
 
 from src.core.event_handler import events
 from src.core.constants import qrcode_path
+from src.core.logging_config import logger
 from src.core.streaming.streaming_service import StreamingService
 
 
@@ -34,11 +35,11 @@ class GoProService(QObject):
         """
         try:
             if not self.streaming_service.start_mediamtx():
-                print("Error starting MediaMTX server")
+                logger.error("Error starting MediaMTX server")
                 return False
 
             rtmp_url = self.streaming_service.get_stream_url()
-            print(f"Streaming started at {rtmp_url}")
+            logger.info(f"Streaming started at {rtmp_url}")
             return True
         except Exception as e:
             events.streaming_error.emit(f"Error starting stream: {str(e)}")

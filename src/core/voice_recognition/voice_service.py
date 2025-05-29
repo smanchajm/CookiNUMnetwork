@@ -12,6 +12,7 @@ from vosk import Model, KaldiRecognizer
 
 from src.core.constants import audio_model_path_fr
 from src.core.event_handler import events
+from src.core.logging_config import logger
 from src.core.voice_recognition.canonical_phrases import (
     CANONICAL_PHRASES,
     INTENT_TO_COMMAND,
@@ -20,7 +21,7 @@ from src.core.voice_recognition.canonical_phrases import (
 )
 
 
-class EnhancedCommandMatcher:
+class CommandMatcher:
     def __init__(self, min_similarity=0.4):
         self.commands = {}
         self.command_texts = []
@@ -83,7 +84,7 @@ class EnhancedCommandMatcher:
                 command_id = self.command_mapping[best_command_text]
                 return command_id, best_similarity, self.commands[command_id]
         except Exception as e:
-            print(f"Error in command matching: {e}")
+            logger.error(f"Error in command matching: {e}")
 
         return None, 0.0, None
 
@@ -102,19 +103,18 @@ class VoiceService(QObject):
         self.audio_thread = None
         self.model = None
         self.recognizer = None
-        self.command_matcher = EnhancedCommandMatcher(min_similarity=0.4)
+        self.command_matcher = CommandMatcher()
         self._initialize_models()
         self._initialize_commands()
 
     def _initialize_models(self):
         """Initialize French Vosk model with proper path handling."""
         try:
-            print(f"Loading French Vosk model from: {audio_model_path_fr}")
             self.model = Model(audio_model_path_fr)
             self.recognizer = KaldiRecognizer(self.model, 16000)
-            print("French Vosk model loaded successfully")
+            logger.info("French Vosk model loaded successfully")
         except Exception as e:
-            print(f"Error loading Vosk model: {e}")
+            logger.error(f"Error loading Vosk model: {e}")
             self.model = None
             self.recognizer = None
 
@@ -151,9 +151,14 @@ class VoiceService(QObject):
                 )
 
     def _extract_tag_number(self, text: str) -> int | None:
-        """Extract a number (1–30) from digits or French words in text."""
+        """Extract a number (1 to 30) from digits or French words in text."""
         text = text.lower()
-        # generate all the variants of the number in french
+        # Mapping of variants of the number in french
+        number_variants = {
+            2: [
+                "de",
+            ],
+        }
         for i in range(1, 31):
             variants = [
                 num2words(i, lang="fr"),
@@ -163,16 +168,12 @@ class VoiceService(QObject):
                 if v in text:
                     return i
 
+        # If no number is found, check the variants of the number
+        for num, variants in number_variants.items():
+            for variant in variants:
+                if variant in text:
+                    return num
         return None
-
-    def _handle_goto_tag(self, text: str):
-        """Handle goto tag command."""
-        tag_number = self._extract_tag_number(text)
-        if tag_number is not None:
-            print(f"Navigating to tag number: {tag_number}")
-            events.request_tag_timestamp.emit(tag_number)
-        else:
-            print(f"No valid tag number found in: {text}")
 
     def _handle_command(self, text):
         """Handle recognized voice commands."""
@@ -182,7 +183,7 @@ class VoiceService(QObject):
 
         # Try to match the command
         best_command, similarity, action = self.command_matcher.match_command(text)
-        print(
+        logger.info(
             f"{'Command recognized: ' + best_command if best_command else 'No matching command found for: ' + text} (score: {similarity:.2f})"
         )
 
@@ -193,11 +194,18 @@ class VoiceService(QObject):
             else:
                 action()
 
+    def _handle_goto_tag(self, text: str):
+        """Handle goto tag command."""
+        tag_number = self._extract_tag_number(text)
+        if tag_number is not None:
+            logger.info(f"Navigating to tag number: {tag_number}")
+            events.request_tag_timestamp.emit(tag_number)
+
     def start(self):
         """Start the voice recognition service."""
         if self.is_running or not self.model:
             if not self.model:
-                print("Cannot start voice recognition: Model not loaded")
+                logger.error("Cannot start voice recognition: Model not loaded")
             return
 
         self.is_running = True
@@ -213,7 +221,7 @@ class VoiceService(QObject):
 
     def stop(self):
         """Stop the voice recognition service."""
-        print("Stopping voice recognition service...")
+        logger.info("Stopping voice recognition service...")
         self.is_running = False
 
         # Clear the audio queue to prevent blocking
@@ -226,58 +234,52 @@ class VoiceService(QObject):
         try:
             sd.stop()
         except Exception as e:
-            print(f"Error stopping audio stream: {e}")
+            logger.error(f"Error stopping audio stream: {e}")
 
         # Join threads with timeout
         if self.thread:
             self.thread.join(timeout=1.0)
             if self.thread.is_alive():
-                print("Warning: Audio processing thread did not terminate gracefully")
+                logger.warning(
+                    "Warning: Audio processing thread did not terminate gracefully"
+                )
             self.thread = None
 
         if self.audio_thread:
             self.audio_thread.join(timeout=2.0)
             if self.audio_thread.is_alive():
-                print("Warning: Audio recording thread did not terminate gracefully")
+                logger.warning(
+                    "Warning: Audio recording thread did not terminate gracefully"
+                )
             self.audio_thread = None
 
-        print("Voice recognition service stopped")
+        logger.info("Voice recognition service stopped")
 
     def _start_audio_recording(self):
         """Start recording audio in a separate thread."""
 
         def audio_callback(indata, frames, time, status):
-            if status:
-                print(f"Audio callback status: {status}")
             self.audio_queue.put(bytes(indata))
 
         try:
-            print("Initializing audio stream...")
+            logger.info("Initializing audio stream...")
             with sd.InputStream(
                 samplerate=16000, channels=1, dtype=np.int16, callback=audio_callback
             ):
-                print("Audio stream initialized successfully")
+                logger.info("Audio stream initialized successfully")
                 while self.is_running:
                     sd.sleep(100)
         except Exception as e:
-            print(f"Error in audio recording: {e}")
+            logger.error(f"Error in audio recording: {e}")
 
     def _process_audio(self):
         """Process audio data and recognize commands."""
-        print("Starting audio processing...")
+        logger.info("Starting audio processing...")
         while self.is_running:
-            try:
-                data = self.audio_queue.get()
-
-                # Process with French model
-                if self.recognizer.AcceptWaveform(data):
-                    result = json.loads(self.recognizer.Result())
-                    if result.get("text"):
-                        text = result["text"].lower()
-                        print(f"Recognized text: {text}")
-                        self._handle_command(text)
-
-            except queue.Empty:
-                continue
-            except Exception as e:
-                print(f"Error processing audio: {e}")
+            data = self.audio_queue.get()
+            if self.recognizer.AcceptWaveform(data):
+                result = json.loads(self.recognizer.Result())
+                if result.get("text"):
+                    text = result["text"].lower()
+                    logger.info(f"Recognized text: {text}")
+                    self._handle_command(text)

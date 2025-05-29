@@ -3,10 +3,8 @@ Canonical phrases for voice command recognition.
 These phrases are used for semantic matching of voice commands.
 """
 
-from src.core.event_handler import events
-
 # Trigger words that must be present in a command
-TRIGGER_PHRASES = ["logiciel", "application"]
+TRIGGER_PHRASES = ["logiciel", "application", "caméra"]
 
 # Important words that give bonus to command matching
 IMPORTANT_WORDS = {
@@ -21,20 +19,6 @@ IMPORTANT_WORDS = {
     "révision",
 }
 
-# Command actions mapping
-COMMAND_ACTIONS = {
-    "play": lambda: events.play_pause_signal.emit(),
-    "pause": lambda: events.play_pause_signal.emit(),
-    "forward": lambda: events.forward_signal.emit(),
-    "backward": lambda: events.rewind_signal.emit(),
-    "tag": lambda: events.add_tag_clicked.emit(),
-    "record": lambda: events.start_recording_clicked.emit(),
-    "stop_record": lambda: events.start_recording_clicked.emit(),
-    "live": lambda: events.live_mode_clicked.emit(),
-    "review": lambda: events.review_mode_clicked.emit(),
-    "open": lambda: events.open_video_clicked.emit(),
-    "goto_tag": lambda text: events.request_tag_timestamp.emit(text),
-}
 
 CANONICAL_PHRASES = {
     "play": [
@@ -218,10 +202,6 @@ CANONICAL_PHRASES = {
         "démarrer la capture",
         "commencer la capture",
         "lancer la capture",
-        "démarrer l'enregistrement vidéo",
-        "commencer l'enregistrement vidéo",
-        "lancer l'enregistrement vidéo",
-        "démarrer la capture vidéo",
         # English phrases
         "start recording",
         "begin recording",
@@ -293,13 +273,11 @@ CANONICAL_PHRASES = {
     "live": [
         # French phrases
         "passer en mode direct",
-        "aller en mode direct",
         "activer le mode direct",
         "afficher le mode direct",
         "basculer en mode direct",
         "changer en mode direct",
         "passer en direct",
-        "aller en direct",
         "activer le direct",
         "afficher le direct",
         # English phrases
@@ -324,23 +302,19 @@ CANONICAL_PHRASES = {
     "review": [
         # French phrases
         "passer en mode révision",
-        "aller en mode révision",
         "activer le mode révision",
         "afficher le mode révision",
         "basculer en mode révision",
         "changer en mode révision",
         "passer en révision",
-        "aller en révision",
         "activer la révision",
         "afficher la révision",
         "passer en mode relecture",
-        "aller en mode relecture",
         "activer le mode relecture",
         "afficher le mode relecture",
         "basculer en mode relecture",
         "changer en mode relecture",
         "passer en relecture",
-        "aller en relecture",
         "activer la relecture",
         "afficher la relecture",
         # English phrases
@@ -412,12 +386,20 @@ CANONICAL_PHRASES = {
         "importes",
     ],
     "open_last_video": [
-        "ouvrir la dernière vidéo",
-        "ouvrir dernière vidéo",
-        "charger dernière vidéo",
-        "charger la dernière vidéo",
-        "dernière vidéo",
+        "recharger la dernière vidéo",
+        "reprendre la dernière vidéo",
+        "retourner à la dernière vidéo",
+        "revoir la dernière vidéo",
+        "recharger le dernier enregistrement",
+        "reprendre le dernier enregistrement",
+        "retourner au dernier enregistrement",
+        "revoir le dernier enregistrement",
         "dernier enregistrement",
+        "dernière capture",
+        "dernier film",
+        "dernière séquence",
+        "lire la dernière vidéo",
+        "lire le dernier enregistrement",
     ],
     "goto_tag": [
         "aller au tag",

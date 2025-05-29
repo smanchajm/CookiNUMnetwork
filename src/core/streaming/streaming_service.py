@@ -6,7 +6,12 @@ import requests
 from PyQt6.QtCore import QObject, QThread, pyqtSignal
 
 from src.core.event_handler import events
-from src.core.constants import mediamtx_path, mediamtx_config, streaming_rtmp_url
+from src.core.constants import (
+    mediamtx_path,
+    mediamtx_config,
+    streaming_rtmp_url,
+)
+from src.core.logging_config import logger
 
 
 class StreamWaiterThread(QThread):
@@ -32,15 +37,15 @@ class StreamWaiterThread(QThread):
                     data = response.json()
                     # Check if there are any active RTMP connections
                     if data.get("itemCount", 0) > 0:
-                        print("Test: RTMP stream is available")
+                        logger.info("RTMP stream is available")
                         self.stream_available.emit()
                         return
                 else:
-                    print(f"Test: API returned status code {response.status_code}")
+                    logger.warning(f"API returned status code {response.status_code}")
             except Exception as e:
                 self.stream_error.emit(f"Error checking stream: {str(e)}")
                 return
-            time.sleep(0.5)  # Réduire l'intervalle de vérification
+            time.sleep(0.5)  # Reduce check interval
 
 
 class StreamingService(QObject):
@@ -60,25 +65,23 @@ class StreamingService(QObject):
         try:
             # Try to connect to the RTMP port
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(0.5)  # Réduire le timeout
+            sock.settimeout(0.5)  # Reduce timeout
             result = sock.connect_ex(("localhost", 1935))
             sock.close()
             return result == 0
         except Exception:
             return False
 
-    def _wait_for_server(
-        self, timeout: int = 5
-    ) -> bool:  # Réduire le timeout par défaut
+    def _wait_for_server(self, timeout: int = 5) -> bool:  # Reduce default timeout
         """Wait for server to be ready with timeout."""
         start_time = time.time()
         while time.time() - start_time < timeout:
-            print("Test: Waiting for server to be ready")
+            logger.info("Waiting for server to be ready")
             if self._is_server_running():
-                print("Test: Server is now ready")
+                logger.info("Server is now ready")
                 return True
-            time.sleep(0.5)  # Augmenter l'intervalle pour réduire la charge
-        print("Test: Server failed to start within timeout period")
+            time.sleep(0.5)  # Increase interval to reduce load
+        logger.error("Server failed to start within timeout period")
         return False
 
     def _start_waiting_for_stream(self):
@@ -103,7 +106,7 @@ class StreamingService(QObject):
 
     def _on_stream_error(self, error: str):
         """Handle stream error."""
-        print(f"Test: Stream error: {error}")
+        logger.error(f"Stream error: {error}")
         self.stop_mediamtx()
         events.streaming_error.emit(error)
 
@@ -111,18 +114,18 @@ class StreamingService(QObject):
         """Start the MediaMTX server."""
         try:
             if self.mediamtx_process is not None:
-                print("Test: MediaMTX process already running")
+                logger.info("MediaMTX process already running")
                 return True
 
-            print("Starting MediaMTX server")
-            # Vérifier si le processus est déjà en cours d'exécution
+            logger.info("Starting MediaMTX server")
+            # Check if process is already running
             if self._is_server_running():
-                print("Test: MediaMTX server is already running on port 1935")
+                logger.info("MediaMTX server is already running on port 1935")
                 self._start_waiting_for_stream()
                 return True
 
             mediamtx_args = [mediamtx_path, mediamtx_config]
-            print("Test: Launching MediaMTX")
+            logger.info("Launching MediaMTX")
             self.mediamtx_process = subprocess.Popen(
                 mediamtx_args,
                 stdout=subprocess.PIPE,
@@ -131,11 +134,11 @@ class StreamingService(QObject):
 
             # Wait for server to be ready
             if not self._wait_for_server():
-                print("Test: MediaMTX server failed to start within timeout")
+                logger.error("MediaMTX server failed to start within timeout")
                 if self.mediamtx_process:
                     stdout, stderr = self.mediamtx_process.communicate()
-                    print("Test: MediaMTX stdout:", stdout.decode())
-                    print("Test: MediaMTX stderr:", stderr.decode())
+                    logger.error(f"MediaMTX stdout: {stdout.decode()}")
+                    logger.error(f"MediaMTX stderr: {stderr.decode()}")
                 self.stop_mediamtx()
                 events.streaming_error.emit(
                     "MediaMTX server failed to start within timeout"
@@ -146,7 +149,7 @@ class StreamingService(QObject):
             self._start_waiting_for_stream()
             return True
         except Exception as e:
-            print(f"Test: Error starting MediaMTX: {str(e)}")
+            logger.error(f"Error starting MediaMTX: {str(e)}")
             events.streaming_error.emit(f"Error starting MediaMTX: {str(e)}")
             return False
 

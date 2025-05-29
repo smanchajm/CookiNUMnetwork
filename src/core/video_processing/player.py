@@ -1,10 +1,13 @@
-from abc import ABC, abstractmethod
 import sys
-import vlc
-import cv2
+from abc import ABC, abstractmethod
+from typing import Optional
 import time
 import threading
-from typing import Optional
+
+import cv2
+import vlc
+
+from src.core.logging_config import logger
 
 
 class Player(ABC):
@@ -131,7 +134,7 @@ class VLCPlayer(Player):
         self.playback_speed = 1.0
         self.speed_levels = [0.25, 0.5, 0.75, 1.0]
         self.zoom_level = 1.0
-        self.zoom_levels = [1.0, 1.5]
+        self.zoom_levels = [0, 2.0]
 
     def load(self, media_path):
         try:
@@ -149,6 +152,9 @@ class VLCPlayer(Player):
 
     def stop(self):
         self.media_player.stop()
+        # Reset zoom to default when stopping
+        self.zoom_level = 1.0
+        self.media_player.video_set_scale(self.zoom_level)
 
     def rewind(self, seconds=10):
         current_time = self.media_player.get_time() / 1000.0
@@ -185,7 +191,7 @@ class VLCPlayer(Player):
         return current_time, total_time
 
     def cleanup(self):
-        self.media_player.stop()
+        self.stop()
         self.media_player.release()
         self.vlc_instance.release()
 
@@ -201,6 +207,7 @@ class VLCPlayer(Player):
         """
         Set the zoom level for the video.
         """
+        logger.info(f"Setting zoom level to {zoom_level}")
         if zoom_level in self.zoom_levels:
             self.zoom_level = zoom_level
             self.media_player.video_set_scale(zoom_level)

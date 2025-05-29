@@ -6,6 +6,7 @@ import threading
 
 from src.core.event_handler import events
 from src.core.constants import video_files_path, streaming_rtmp_url
+from src.core.logging_config import logger
 
 
 class RecordingThread(QThread):
@@ -37,7 +38,7 @@ class RecordingThread(QThread):
             )
 
             # Open RTMP stream
-            print(f"Opening RTMP stream: {streaming_rtmp_url}")
+            logger.info(f"Opening RTMP stream: {streaming_rtmp_url}")
             self._cap = cv2.VideoCapture(streaming_rtmp_url)
             if not self._cap.isOpened():
                 raise Exception("Could not open video stream")
@@ -46,11 +47,9 @@ class RecordingThread(QThread):
             width = int(self._cap.get(cv2.CAP_PROP_FRAME_WIDTH))
             height = int(self._cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
             fps = int(self._cap.get(cv2.CAP_PROP_FPS))
-            print(f"Video properties: {width}x{height} @ {fps}fps")
 
             # Create video writer with MP4V codec
             fourcc = cv2.VideoWriter_fourcc(*"mp4v")  # MP4V codec
-            print(f"Creating video writer with codec: mp4v")
             self._writer = cv2.VideoWriter(
                 self._output_file, fourcc, fps, (width, height), True  # isColor
             )
@@ -64,7 +63,7 @@ class RecordingThread(QThread):
             events.recording_started.emit(self._output_file)
 
         except Exception as e:
-            print(f"Error starting recording: {str(e)}")
+            logger.error(f"Error starting recording: {str(e)}")
             events.recording_error.emit(f"Error starting recording: {str(e)}")
             if self._cap:
                 self._cap.release()
@@ -154,13 +153,13 @@ class RecordingService(QObject):
 
     def _on_recording_started(self, output_file: str):
         """Handle recording started event from thread."""
-        print(f"Recording started: {output_file}")
+        logger.info(f"Recording started: {output_file}")
         self._is_recording = True
         events.recording_state_changed.emit(True)
 
     def _on_recording_stopped(self, output_file: str):
         """Handle recording stopped event from thread."""
-        print(f"Recording stopped and saved to: {output_file}")
+        logger.info(f"Recording stopped and saved to: {output_file}")
         self._is_recording = False
         events.recording_state_changed.emit(False)
         # Reset thread after recording is stopped
@@ -168,7 +167,7 @@ class RecordingService(QObject):
 
     def _on_recording_error(self, error: str):
         """Handle recording error event from thread."""
-        print(f"Recording error: {error}")
+        logger.error(f"Recording error: {error}")
         self._is_recording = False
         events.recording_state_changed.emit(False)
         # Reset thread after error
@@ -218,6 +217,6 @@ class RecordingService(QObject):
                 self._recording_thread = None
 
             except Exception as e:
-                print(f"Error during cleanup: {str(e)}")
+                logger.error(f"Error during cleanup: {str(e)}")
             finally:
                 self._is_recording = False

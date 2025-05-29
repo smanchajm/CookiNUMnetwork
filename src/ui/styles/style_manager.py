@@ -2,6 +2,7 @@
 Gestionnaire de styles pour l'application.
 """
 
+from src.core.logging_config import logger
 from src.utils.resource_manager import ResourceManager
 
 
@@ -19,5 +20,5 @@ class StyleManager:
         try:
             return ResourceManager.get_style_content()
         except FileNotFoundError:
-            print("Attention: Fichier de style non trouvé")
+            logger.warning("Attention: Fichier de style non trouvé")
             return ""

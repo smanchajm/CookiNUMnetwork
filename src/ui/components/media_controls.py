@@ -157,8 +157,6 @@ class MediaControls(QWidget):
         """Called when slider value changes (0-100)."""
         if self.is_programmatic_update:
             return
-
-        print(f"[Controls] Slider value changed to {value}%")
         events.seek_signal.emit(value / 100.0)  # Convert to percentage (0-1)
 
     def on_tags_changed(self, tags: list[tuple[str, str, str]]):
@@ -187,8 +185,6 @@ class MediaControls(QWidget):
                 continue
 
     def update_total_time(self, total_time):
-        print(f"Updating total time to {total_time}")
         self.total_time = total_time
-        # Refresh tag markers with the new total time
         if hasattr(self, "current_tags"):
             self.on_tags_changed(self.current_tags)
