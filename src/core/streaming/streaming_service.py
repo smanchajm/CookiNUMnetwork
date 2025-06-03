@@ -5,12 +5,8 @@ import time
 import requests
 from PyQt6.QtCore import QObject, QThread, pyqtSignal
 
+from src.utils.resource_manager import ResourceManager
 from src.core.event_handler import events
-from src.core.constants import (
-    mediamtx_path,
-    mediamtx_config,
-    streaming_rtmp_url,
-)
 from src.core.logging_config import logger
 
 
@@ -19,10 +15,12 @@ class StreamWaiterThread(QThread):
 
     stream_available = pyqtSignal()
     stream_error = pyqtSignal(str)
+    stream_stopped = pyqtSignal()  # New signal for stream stop
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self._is_running = True
+        self._was_streaming = False
 
     def stop(self):
         """Stop the thread."""
@@ -36,10 +34,16 @@ class StreamWaiterThread(QThread):
                 if response.status_code == 200:
                     data = response.json()
                     # Check if there are any active RTMP connections
-                    if data.get("itemCount", 0) > 0:
+                    has_stream = data.get("itemCount", 0) > 0
+
+                    if has_stream and not self._was_streaming:
                         logger.info("RTMP stream is available")
+                        self._was_streaming = True
                         self.stream_available.emit()
-                        return
+                    elif not has_stream and self._was_streaming:
+                        logger.info("RTMP stream is no longer available")
+                        self._was_streaming = False
+                        self.stream_stopped.emit()
                 else:
                     logger.warning(f"API returned status code {response.status_code}")
             except Exception as e:
@@ -97,6 +101,9 @@ class StreamingService(QObject):
         self.stream_waiter = StreamWaiterThread(self)
         self.stream_waiter.stream_available.connect(self._on_stream_available)
         self.stream_waiter.stream_error.connect(self._on_stream_error)
+        self.stream_waiter.stream_stopped.connect(
+            self._on_stream_stopped
+        )  # Connect new signal
         self.stream_waiter.start()
 
     def _on_stream_available(self):
@@ -104,11 +111,17 @@ class StreamingService(QObject):
         self.is_streaming = True
         events.streaming_started.emit()
 
+    def _on_stream_stopped(self):
+        """Handle stream becoming unavailable."""
+        self.is_streaming = False
+        events.streaming_stopped.emit()
+
     def _on_stream_error(self, error: str):
         """Handle stream error."""
         logger.error(f"Stream error: {error}")
-        self.stop_mediamtx()
+        self.is_streaming = False
         events.streaming_error.emit(error)
+        self.stop_mediamtx()
 
     def start_mediamtx(self) -> bool:
         """Start the MediaMTX server."""
@@ -124,10 +137,9 @@ class StreamingService(QObject):
                 self._start_waiting_for_stream()
                 return True
 
-            mediamtx_args = [mediamtx_path, mediamtx_config]
             logger.info("Launching MediaMTX")
             self.mediamtx_process = subprocess.Popen(
-                mediamtx_args,
+                ResourceManager.get_mediamtx_args(),
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
             )
@@ -168,11 +180,13 @@ class StreamingService(QObject):
                 self.mediamtx_process = None
                 self.is_streaming = False
                 events.streaming_stopped.emit()
+                return True
             return True
         except Exception as e:
+            logger.error(f"Error stopping MediaMTX: {str(e)}")
             events.streaming_error.emit(f"Error stopping MediaMTX: {str(e)}")
             return False
 
     def get_stream_url(self) -> str:
         """Return the RTMP stream URL."""
-        return streaming_rtmp_url
+        return ResourceManager.get_gopro_rtmp_url()

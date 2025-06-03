@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 from PyQt6.QtWidgets import (
     QDialog,
     QVBoxLayout,
@@ -93,8 +93,8 @@ class WiFiConnectionDialog(QDialog):
         qrcode_file = self.gopro_service.generate_wifi_qrcode(ssid, password)
 
         # Afficher le QR code généré
-        if os.path.exists(qrcode_file):
-            pixmap = QPixmap(qrcode_file)
+        if Path(qrcode_file).exists():
+            pixmap = QPixmap(str(qrcode_file))
             self.qrcode_label.setPixmap(
                 pixmap.scaled(
                     self.qrcode_label.size(),

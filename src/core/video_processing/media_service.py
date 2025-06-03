@@ -1,11 +1,11 @@
 from PyQt6.QtCore import QObject, QTimer
 from PyQt6.QtWidgets import QFileDialog
-import os
+from pathlib import Path
 
-from src.core.constants import video_files_path
 from src.core.logging_config import logger
 from src.core.video_processing.player import Player
 from src.core.event_handler import events
+from src.utils.resource_manager import ResourceManager
 
 
 class MediaService(QObject):
@@ -30,24 +30,24 @@ class MediaService(QObject):
 
         events.media_loaded.connect(self.load_media)
 
-    def open_video_file(self, parent_widget=None, start_dir=video_files_path):
+    def open_video_file(
+        self, parent_widget=None, start_dir=ResourceManager.get_app_data_paths("videos")
+    ):
         """
         Open a dialog to select a video file.
         """
-        if start_dir is None:
-            start_dir = os.path.expanduser("~")
-        elif not os.path.exists(start_dir):
-            start_dir = os.path.expanduser("~")
+        if not Path(start_dir).exists():
+            start_dir = str(Path.home())
 
         file_path, _ = QFileDialog.getOpenFileName(
             parent_widget,
             "Ouvrir une vidéo",
-            start_dir,
+            str(start_dir),
             "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov);;Tous les fichiers (*.*)",
         )
 
         if file_path:
-            if os.path.exists(file_path):
+            if Path(file_path).exists():
                 events.media_loaded.emit(file_path)
                 return file_path
             else:
@@ -197,16 +197,16 @@ class MediaService(QObject):
         """
         Load the most recently recorded video from the video files directory.
         """
-        if not os.path.exists(video_files_path):
-            events.media_error.emit(f"Directory {video_files_path} does not exist.")
+        video_path = ResourceManager.get_app_data_paths("videos")
+        if not video_path.exists():
+            events.media_error.emit(f"Directory {video_path} does not exist.")
             return None
 
         # Get all video files in the directory
         video_files = []
-        for file in os.listdir(video_files_path):
-            if file.lower().endswith((".mp4")):
-                file_path = os.path.join(video_files_path, file)
-                video_files.append((file_path, os.path.getmtime(file_path)))
+        for file in video_path.iterdir():
+            if file.suffix.lower() == ".mp4":
+                video_files.append((file, file.stat().st_mtime))
 
         if not video_files:
             events.media_error.emit("No videos found in the recording directory.")
@@ -214,6 +214,6 @@ class MediaService(QObject):
 
         # Sort by modification time (most recent first)
         video_files.sort(key=lambda x: x[1], reverse=True)
-        latest_video = video_files[0][0]
+        latest_video = str(video_files[0][0])
         events.media_loaded.emit(latest_video)
         return latest_video

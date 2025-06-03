@@ -1,12 +1,12 @@
 from PyQt6.QtCore import QObject, QThread, pyqtSignal
-import os
+from pathlib import Path
 from datetime import datetime
 import cv2
 import threading
 
 from src.core.event_handler import events
-from src.core.constants import video_files_path, streaming_rtmp_url
 from src.core.logging_config import logger
+from src.utils.resource_manager import ResourceManager
 
 
 class RecordingThread(QThread):
@@ -28,18 +28,16 @@ class RecordingThread(QThread):
         """Start the recording process."""
         try:
             # Create output directory if it doesn't exist
-            if not os.path.exists(video_files_path):
-                os.makedirs(video_files_path)
+            video_path = ResourceManager.get_app_data_paths("videos")
+            video_path.mkdir(parents=True, exist_ok=True)
 
             # Generate output filename with timestamp
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            self._output_file = os.path.join(
-                video_files_path, f"recording_{timestamp}.mp4"
-            )
+            self._output_file = video_path / f"recording_{timestamp}.mp4"
 
             # Open RTMP stream
-            logger.info(f"Opening RTMP stream: {streaming_rtmp_url}")
-            self._cap = cv2.VideoCapture(streaming_rtmp_url)
+            logger.info(f"Opening RTMP stream: {ResourceManager.get_gopro_rtmp_url()}")
+            self._cap = cv2.VideoCapture(ResourceManager.get_gopro_rtmp_url())
             if not self._cap.isOpened():
                 raise Exception("Could not open video stream")
 
@@ -51,7 +49,7 @@ class RecordingThread(QThread):
             # Create video writer with MP4V codec
             fourcc = cv2.VideoWriter_fourcc(*"mp4v")  # MP4V codec
             self._writer = cv2.VideoWriter(
-                self._output_file, fourcc, fps, (width, height), True  # isColor
+                str(self._output_file), fourcc, fps, (width, height), True  # isColor
             )
 
             if not self._writer.isOpened():
@@ -60,7 +58,7 @@ class RecordingThread(QThread):
             self._start_time = datetime.now()
             self._record_thread = threading.Thread(target=self._record_frames)
             self._record_thread.start()
-            events.recording_started.emit(self._output_file)
+            events.recording_started.emit(str(self._output_file))
 
         except Exception as e:
             logger.error(f"Error starting recording: {str(e)}")
@@ -92,8 +90,8 @@ class RecordingThread(QThread):
             self._cap.release()
             self._cap = None
 
-        if self._output_file and os.path.exists(self._output_file):
-            events.recording_stopped.emit(self._output_file)
+        if self._output_file and Path(self._output_file).exists():
+            events.recording_stopped.emit(str(self._output_file))
 
     def stop(self):
         """Stop the thread."""
@@ -148,7 +146,7 @@ class RecordingService(QObject):
     def current_recording_path(self) -> str:
         """Get the path of the current recording file."""
         if self._recording_thread and self._is_recording:
-            return self._recording_thread._output_file
+            return str(self._recording_thread._output_file)
         return None
 
     def _on_recording_started(self, output_file: str):

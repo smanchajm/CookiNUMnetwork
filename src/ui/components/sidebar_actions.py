@@ -1,6 +1,5 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout
 
-from src.core import constants
 from src.core.event_handler import events
 from src.core.video_processing.mode_service import Mode
 from src.ui.utils.layouts import create_vbox_layout

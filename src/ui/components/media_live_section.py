@@ -6,7 +6,6 @@ import os
 
 from src.ui.utils.layouts import create_vbox_layout
 from src.core.video_processing.player import VLCPlayer
-from src.core.constants import streaming_rtsp_url
 from src.core.logging_config import logger
 from src.utils.resource_manager import ResourceManager
 
@@ -75,19 +74,25 @@ class MediaLiveSection(QFrame):
         self.is_rtmp_connected = True
         self._update_display()
 
-        # Configurer le lecteur pour lire le flux rtsp (moins de latence)
         logger.info("on_streaming_started")
-        self.player.load(streaming_rtsp_url)
+        self.player.load(ResourceManager.get_gopro_rtsp_url())
         if self.video_frame.winId():
-            logger.info("Test: on_streaming_started")
-        self.player.set_video_output(self.video_frame.winId())
-        self.player.play()
+            self.player.set_video_output(self.video_frame.winId())
+            self.player.play()
 
     def on_streaming_stopped(self):
         """Handle streaming stop."""
         self.is_rtmp_connected = False
         self._update_display()
         self.player.stop()
+        # Reset player state
+        self.player.media_player.release()
+        self.player = VLCPlayer()
+
+    def on_streaming_error(self, error: str):
+        """Handle streaming error."""
+        logger.error(f"Streaming error in MediaLiveSection: {error}")
+        self.on_streaming_stopped()  # Use same cleanup as stop
 
     def _update_display(self):
         """Update display based on connection state."""

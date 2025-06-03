@@ -7,6 +7,7 @@ from src.utils.fonts import add_fonts
 from src.ui.styles.style_manager import StyleManager
 from src.core.logging_config import logger
 import ctypes
+from src.utils.resource_manager import ResourceManager
 
 
 def main():
@@ -30,6 +31,8 @@ def main():
     app.setStyleSheet(app.styleSheet() + styles)
 
     # Create the main window and the controller
+    ResourceManager.create_app_data_paths()
+    logger.info(ResourceManager.get_ipv4_address())
     window = MainWindow()
     controller = MainController(window)
 

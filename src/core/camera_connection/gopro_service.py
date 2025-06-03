@@ -1,11 +1,12 @@
 import qrcode
-import os
+from pathlib import Path
 from PyQt6.QtCore import QObject
 
+
 from src.core.event_handler import events
-from src.core.constants import qrcode_path
 from src.core.logging_config import logger
 from src.core.streaming.streaming_service import StreamingService
+from src.utils.resource_manager import ResourceManager
 
 
 class GoProService(QObject):
@@ -38,7 +39,7 @@ class GoProService(QObject):
                 logger.error("Error starting MediaMTX server")
                 return False
 
-            rtmp_url = self.streaming_service.get_stream_url()
+            rtmp_url = ResourceManager.get_gopro_rtmp_url()
             logger.info(f"Streaming started at {rtmp_url}")
             return True
         except Exception as e:
@@ -56,8 +57,8 @@ class GoProService(QObject):
             return False
 
     def qrcode_gopro(self, content: str):
-        if not os.path.exists(qrcode_path):
-            os.makedirs(qrcode_path)
+        qrcode_dir = ResourceManager.get_app_data_paths("qrcode")
+        qrcode_dir.mkdir(parents=True, exist_ok=True)
 
         qr = qrcode.QRCode(
             version=1,
@@ -68,9 +69,9 @@ class GoProService(QObject):
         qr.add_data(content)
         qr.make(fit=True)
 
-        filename = os.path.join(qrcode_path, "gopro_qrcode.png")
+        filename = qrcode_dir / "gopro_qrcode.png"
         image = qr.make_image(fill_color="black", back_color="white")
-        image.save(filename)
+        image.save(str(filename))
 
         events.qrcode_created.emit(f"QR code generated: {filename}")
 
@@ -79,8 +80,8 @@ class GoProService(QObject):
         Generate WiFi QR code with special format
         !MJOIN="SSID:PASSWORD" used by GoPro cameras.
         """
-        if not os.path.exists(qrcode_path):
-            os.makedirs(qrcode_path)
+        qrcode_dir = ResourceManager.get_app_data_paths("qrcode")
+        qrcode_dir.mkdir(parents=True, exist_ok=True)
 
         content = f'!MJOIN="{ssid}:{password}"'
 
@@ -93,12 +94,12 @@ class GoProService(QObject):
         qr.add_data(content)
         qr.make(fit=True)
 
-        filename = os.path.join(qrcode_path, "wifi_qrcode.png")
+        filename = qrcode_dir / "wifi_qrcode.png"
         image = qr.make_image(fill_color="black", back_color="white")
-        image.save(filename)
+        image.save(str(filename))
 
         events.qrcode_created.emit(f"WiFi QR code generated: {filename}")
-        return filename
+        return str(filename)
 
     def disconnect(self):
         """

@@ -10,9 +10,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from vosk import Model, KaldiRecognizer
 
-from src.core.constants import audio_model_path_fr
 from src.core.event_handler import events
 from src.core.logging_config import logger
+from src.utils.resource_manager import ResourceManager
 from src.core.voice_recognition.canonical_phrases import (
     CANONICAL_PHRASES,
     INTENT_TO_COMMAND,
@@ -110,7 +110,7 @@ class VoiceService(QObject):
     def _initialize_models(self):
         """Initialize French Vosk model with proper path handling."""
         try:
-            self.model = Model(audio_model_path_fr)
+            self.model = Model(str(ResourceManager.get_audio_model_path()))
             self.recognizer = KaldiRecognizer(self.model, 16000)
             logger.info("French Vosk model loaded successfully")
         except Exception as e:
@@ -205,6 +205,7 @@ class VoiceService(QObject):
 
     def start(self):
         """Start the voice recognition service."""
+        logger.info("test start reco")
         if self.is_running or not self.model:
             if not self.model:
                 logger.error("Cannot start voice recognition: Model not loaded")

@@ -4,13 +4,13 @@ Contains classes and functions for managing tags in the application.
 """
 
 import time
-import os
+from pathlib import Path
 import json
 from typing import List, Tuple, Optional
 
-from src.core.constants import tags_path
 from src.core.event_handler import events
 from src.core.logging_config import logger
+from src.utils.resource_manager import ResourceManager
 
 
 class TagService:
@@ -23,13 +23,14 @@ class TagService:
         self.current_video_path: Optional[str] = None
 
         # Create tags directory if it doesn't exist
-        if not os.path.exists(tags_path):
-            os.makedirs(tags_path)
+        ResourceManager.get_app_data_paths("tags").mkdir(parents=True, exist_ok=True)
 
-    def _get_tags_file_path(self, video_path: str) -> str:
+    def _get_tags_file_path(self, video_path: str) -> Path:
         """Get the path to the JSON file storing tags for a video."""
-        video_filename = os.path.basename(video_path)
-        tags_file = os.path.join(tags_path, video_filename.replace(".mp4", ".json"))
+        video_path = Path(video_path)
+        tags_file = (
+            ResourceManager.get_app_data_paths("tags") / f"{video_path.stem}.json"
+        )
         return tags_file
 
     def reload_tags(self) -> None:
@@ -46,7 +47,7 @@ class TagService:
         tags_file = self._get_tags_file_path(video_path)
         logger.info(f"Loading tags for video: {tags_file}")
 
-        if os.path.exists(tags_file):
+        if tags_file.exists():
             try:
                 with open(tags_file, "r", encoding="utf-8") as f:
                     self._tags = json.load(f)
