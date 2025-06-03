@@ -1,8 +1,10 @@
-from PyQt6.QtCore import QObject, QThread, pyqtSignal
-from pathlib import Path
-from datetime import datetime
-import cv2
 import threading
+from datetime import datetime
+from pathlib import Path
+
+import cv2
+from PyQt6.QtCore import QObject, QThread
+
 
 from src.core.event_handler import events
 from src.core.logging_config import logger

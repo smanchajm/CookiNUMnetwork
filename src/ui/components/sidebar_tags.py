@@ -1,17 +1,16 @@
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
-    QWidget,
+    QHBoxLayout,
     QLabel,
     QScrollArea,
-    QSpacerItem,
     QSizePolicy,
-    QHBoxLayout,
+    QWidget,
 )
-from PyQt6.QtCore import Qt, QSize
 
-from src.ui.widgets.action_button import ActionButton
+from src.core.event_handler import events
 from src.ui.utils.layouts import create_vbox_layout
 from src.ui.utils.qt_helpers import clear_layout
-from src.core.event_handler import events
+from src.ui.widgets.action_button import ActionButton
 from src.utils.resource_manager import ResourceManager
 
 

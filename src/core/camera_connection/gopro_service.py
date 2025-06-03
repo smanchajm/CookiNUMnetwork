@@ -1,5 +1,5 @@
 import qrcode
-from pathlib import Path
+
 from PyQt6.QtCore import QObject
 
 

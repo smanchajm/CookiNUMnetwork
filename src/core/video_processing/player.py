@@ -1,8 +1,8 @@
 import sys
-from abc import ABC, abstractmethod
-from typing import Optional
 import time
 import threading
+from abc import ABC, abstractmethod
+from typing import Optional
 
 import cv2
 import vlc

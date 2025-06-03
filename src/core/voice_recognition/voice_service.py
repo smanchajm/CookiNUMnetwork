@@ -12,13 +12,13 @@ from vosk import Model, KaldiRecognizer
 
 from src.core.event_handler import events
 from src.core.logging_config import logger
-from src.utils.resource_manager import ResourceManager
 from src.core.voice_recognition.canonical_phrases import (
     CANONICAL_PHRASES,
     INTENT_TO_COMMAND,
     TRIGGER_PHRASES,
     IMPORTANT_WORDS,
 )
+from src.utils.resource_manager import ResourceManager
 
 
 class CommandMatcher:

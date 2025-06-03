@@ -1,12 +1,14 @@
-import sys
-from PyQt6.QtWidgets import QApplication
-from PyQt6.QtGui import QFont
-from src.ui.views.main_window import MainWindow
-from src.core.main_controller import MainController
-from src.utils.fonts import add_fonts
-from src.ui.styles.style_manager import StyleManager
-from src.core.logging_config import logger
 import ctypes
+import sys
+
+from PyQt6.QtGui import QFont
+from PyQt6.QtWidgets import QApplication
+
+from src.core.logging_config import logger
+from src.core.main_controller import MainController
+from src.ui.styles.style_manager import StyleManager
+from src.ui.views.main_window import MainWindow
+from src.utils.fonts import add_fonts
 from src.utils.resource_manager import ResourceManager
 
 

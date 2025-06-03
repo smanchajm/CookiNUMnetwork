@@ -1,7 +1,6 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout
+from PyQt6.QtWidgets import QWidget
 
 from src.core.event_handler import events
-from src.core.video_processing.mode_service import Mode
 from src.ui.utils.layouts import create_vbox_layout
 from src.ui.widgets.action_button import ActionButton
 from src.ui.widgets.separator import Separator

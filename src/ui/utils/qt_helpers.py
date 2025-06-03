@@ -1,7 +1,7 @@
 """Utility functions to simplify common Qt operations."""
 
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QSizePolicy, QSpacerItem
-from PyQt6.QtCore import Qt, QSize
 
 
 def set_margins(content, left=0, top=0, right=0, bottom=0):

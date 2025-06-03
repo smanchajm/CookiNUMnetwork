@@ -1,8 +1,7 @@
-from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QKeySequence, QShortcut
 from PyQt6.QtWidgets import QWidget
+
 from src.core.event_handler import events
-from src.core.logging_config import logger
 
 
 class KeyboardShortcutsService:

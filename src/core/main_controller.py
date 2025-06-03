@@ -1,16 +1,17 @@
 from PyQt6.QtWidgets import QMainWindow
+
 from src.core.camera_connection.gopro_service import GoProService
+from src.core.event_handler import events
+from src.core.keyboard_shortcuts_service import KeyboardShortcutsService
+from src.core.logging_config import logger
+from src.core.streaming.streaming_service import StreamingService
 from src.core.video_processing.media_service import MediaService
 from src.core.video_processing.mode_service import ModeService, Mode
 from src.core.video_processing.player import VLCPlayer
 from src.core.video_processing.recording_service import RecordingService
 from src.core.video_processing.tag_service import TagService
-from src.core.streaming.streaming_service import StreamingService
 from src.core.voice_recognition.voice_service import VoiceService
 from src.ui.dialogs.dialog_service import DialogService
-from src.core.event_handler import events
-from src.core.keyboard_shortcuts_service import KeyboardShortcutsService
-from src.core.logging_config import logger
 
 
 class MainController:

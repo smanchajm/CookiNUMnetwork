@@ -1,6 +1,6 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout
-from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
+from PyQt6.QtSvgWidgets import QSvgWidget
 
 from src.utils.resource_manager import ResourceManager
 

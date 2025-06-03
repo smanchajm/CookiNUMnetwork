@@ -1,13 +1,14 @@
-from typing import Optional
+import requests
 import subprocess
 import socket
 import time
-import requests
+from typing import Optional
+
 from PyQt6.QtCore import QObject, QThread, pyqtSignal
 
-from src.utils.resource_manager import ResourceManager
 from src.core.event_handler import events
 from src.core.logging_config import logger
+from src.utils.resource_manager import ResourceManager
 
 
 class StreamWaiterThread(QThread):

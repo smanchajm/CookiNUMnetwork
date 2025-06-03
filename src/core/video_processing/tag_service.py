@@ -3,10 +3,10 @@ Tag management module.
 Contains classes and functions for managing tags in the application.
 """
 
+import json
 import time
 from pathlib import Path
-import json
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
 
 from src.core.event_handler import events
 from src.core.logging_config import logger

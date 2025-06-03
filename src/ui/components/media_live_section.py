@@ -1,12 +1,12 @@
 import time
-from PyQt6.QtWidgets import QFrame, QLabel
-from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
-from PyQt6.QtCore import Qt, QUrl
-import os
 
-from src.ui.utils.layouts import create_vbox_layout
-from src.core.video_processing.player import VLCPlayer
+from PyQt6.QtCore import Qt, QUrl
+from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
+from PyQt6.QtWidgets import QFrame, QLabel
+
 from src.core.logging_config import logger
+from src.core.video_processing.player import VLCPlayer
+from src.ui.utils.layouts import create_vbox_layout
 from src.utils.resource_manager import ResourceManager
 
 

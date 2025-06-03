@@ -1,15 +1,13 @@
-from pathlib import Path
-
-from PyQt6.QtWidgets import (
-    QDialog,
-    QVBoxLayout,
-    QLabel,
-)
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap
+from PyQt6.QtWidgets import (
+    QDialog,
+    QLabel,
+    QVBoxLayout,
+)
 
-from src.ui.widgets.action_button import ActionButton
 from src.core.camera_connection.gopro_service import GoProService
+from src.ui.widgets.action_button import ActionButton
 from src.utils.resource_manager import ResourceManager
 
 

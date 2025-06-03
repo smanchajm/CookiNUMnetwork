@@ -1,10 +1,11 @@
-from PyQt6.QtCore import QObject, QTimer
-from PyQt6.QtWidgets import QFileDialog
 from pathlib import Path
 
+from PyQt6.QtCore import QObject, QTimer
+from PyQt6.QtWidgets import QFileDialog
+
+from src.core.event_handler import events
 from src.core.logging_config import logger
 from src.core.video_processing.player import Player
-from src.core.event_handler import events
 from src.utils.resource_manager import ResourceManager
 
 

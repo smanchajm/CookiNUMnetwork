@@ -9,7 +9,6 @@ import os
 import socket
 import sys
 from pathlib import Path
-from typing import Union, Tuple
 
 
 class ResourceManager:

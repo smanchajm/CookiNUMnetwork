@@ -1,12 +1,12 @@
 import time
 
-from PyQt6.QtWidgets import QWidget, QLabel, QSlider, QStyle, QStyleOptionSlider
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon, QPainter
+from PyQt6.QtWidgets import QLabel, QSlider, QStyle, QStyleOptionSlider, QWidget
 
-from src.ui.widgets.action_button import ActionButton
-from src.ui.utils.layouts import create_vbox_layout, create_hbox_layout
 from src.core.event_handler import events
+from src.ui.utils.layouts import create_hbox_layout, create_vbox_layout
+from src.ui.widgets.action_button import ActionButton
 from src.utils.resource_manager import ResourceManager
 
 
