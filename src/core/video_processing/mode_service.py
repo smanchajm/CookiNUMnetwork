@@ -1,6 +1,6 @@
 """
 Service for managing application modes (Live/Review).
-Handles transitions between different modes and notifies concerned components.
+Handles transitions between different modes and notifies concerned sections.
 """
 
 from enum import Enum, auto

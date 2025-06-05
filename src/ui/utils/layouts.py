@@ -1,4 +1,4 @@
-"""Common layout patterns for UI components."""
+"""Common layout patterns for UI sections."""
 
 from PyQt6.QtWidgets import (
     QVBoxLayout,

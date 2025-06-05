@@ -25,7 +25,7 @@ class MainController:
     def __init__(self, main_window: QMainWindow):
         self.main_window = main_window
 
-        # Initialize base components
+        # Initialize base sections
         self.replay_player = VLCPlayer()
         self.tag_manager = TagService()
         self.mode_manager = ModeService()
@@ -60,7 +60,7 @@ class MainController:
         logger.info("Voice service started")
 
     def setup_connections(self):
-        """Configure all signal connections between components."""
+        """Configure all signal connections between sections."""
         self._setup_application_connections()
         self._setup_sidebar_connections()
         self._setup_media_connections()

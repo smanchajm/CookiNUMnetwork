@@ -3,9 +3,9 @@ from PyQt6.QtWidgets import (
     QSizePolicy,
 )
 
-from src.ui.components.sidebar_logo import LogoSection
-from src.ui.components.sidebar_actions import ActionButtonsSection
-from src.ui.components.sidebar_tags import TagListSection
+from src.ui.sections.sidebar_logo_section import LogoSection
+from src.ui.sections.sidebar_actions_section import ActionButtonsSection
+from src.ui.sections.sidebar_tags_section import TagListSection
 from src.ui.utils.layouts import create_vbox_layout
 
 
@@ -19,7 +19,7 @@ class Sidebar(QFrame):
         self._setup_ui()
 
     def _setup_ui(self):
-        """Create section components and arrange them in the layout."""
+        """Create section sections and arrange them in the layout."""
         self.logo_section = LogoSection()
         self.action_section = ActionButtonsSection()
         self.tag_section = TagListSection()

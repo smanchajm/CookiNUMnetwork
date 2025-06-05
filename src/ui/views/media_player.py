@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QFrame
 
-from src.ui.components.media_live_section import MediaLiveSection
-from src.ui.components.media_replay_section import MediaReplaySection
+from src.ui.sections.media_live_section import MediaLiveSection
+from src.ui.sections.media_replay_section import MediaReplaySection
 from src.ui.utils.layouts import create_vbox_layout
 
 

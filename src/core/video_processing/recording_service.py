@@ -111,7 +111,7 @@ class RecordingThread(QThread):
 class RecordingService(QObject):
     """
     Service managing video recording.
-    Centralizes recording state and notifies concerned components.
+    Centralizes recording state and notifies concerned sections.
     Handles RTMP stream recording when streaming is active.
     """
 
