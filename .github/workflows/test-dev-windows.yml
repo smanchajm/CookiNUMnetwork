@@ -38,7 +38,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
-          pip install -e .
+          pip install -e . --no-deps
 
       - name: Run app in dev mode (capturing output)
         shell: powershell
@@ -47,6 +47,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path $logDir | Out-Null
 
           Write-Host "=== Lancement de l'app ==="
+          $env:PYTHONPATH = "."
           python -m src.core.main
           Start-Sleep -Seconds 20
           if ($LASTEXITCODE -ne 0) {
