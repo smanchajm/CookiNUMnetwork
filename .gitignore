@@ -61,6 +61,13 @@ ressources/mediamtx/LICENSE
 # Ressources directory
 ressources/
 
+# PyInstaller
+dist/
+build/
+*.spec
+
+
+
 
 
 tags/
