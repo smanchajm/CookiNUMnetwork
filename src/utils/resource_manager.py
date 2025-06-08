@@ -21,7 +21,7 @@ class ResourceManager:
     STREAMING_HOST = "localhost"
     STREAMING_RTMP_PORT = 1935
     STREAMING_RTSP_PORT = 8554
-    STREAMING_PATH = Path("live/stream")
+    STREAMING_PATH = "live/stream"
 
     @staticmethod
     def _get_streaming_url(protocol: str, port: int) -> str:

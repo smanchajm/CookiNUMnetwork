@@ -3,27 +3,25 @@ from datetime import datetime
 from pathlib import Path
 
 import cv2
-from PyQt6.QtCore import QObject, QThread
-
+from PyQt6.QtCore import QObject
 
 from src.core.event_handler import events
 from src.core.logging_config import logger
 from src.utils.resource_manager import ResourceManager
 
 
-class RecordingThread(QThread):
+class RecordingThread(threading.Thread):
     """
     Thread handling the recording process.
     Manages FFmpeg process and file operations asynchronously.
     """
 
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__(daemon=True)
         self._is_running = True
         self._output_file = None
         self._cap = None
         self._writer = None
-        self._record_thread = None
         self._start_time = None
 
     def start_recording(self):
@@ -58,8 +56,7 @@ class RecordingThread(QThread):
                 raise Exception("Could not create video writer")
 
             self._start_time = datetime.now()
-            self._record_thread = threading.Thread(target=self._record_frames)
-            self._record_thread.start()
+            self.start()  # Start the thread
             events.recording_started.emit(str(self._output_file))
 
         except Exception as e:
@@ -70,7 +67,8 @@ class RecordingThread(QThread):
             if self._writer:
                 self._writer.release()
 
-    def _record_frames(self):
+    def run(self):
+        """Main thread function that records frames."""
         while self._is_running and self._cap is not None and self._writer is not None:
             ret, frame = self._cap.read()
             if ret:
@@ -81,8 +79,8 @@ class RecordingThread(QThread):
     def stop_recording(self):
         """Stop the recording process cleanly."""
         self._is_running = False
-        if self._record_thread:
-            self._record_thread.join()
+        if self.is_alive():
+            self.join(timeout=2.0)
 
         if self._writer:
             self._writer.release()
@@ -94,12 +92,6 @@ class RecordingThread(QThread):
 
         if self._output_file and Path(self._output_file).exists():
             events.recording_stopped.emit(str(self._output_file))
-
-    def stop(self):
-        """Stop the thread."""
-        self._is_running = False
-        self.stop_recording()
-        self.wait()
 
     def get_recording_duration(self) -> float:
         """Get the current recording duration in seconds."""
@@ -131,10 +123,14 @@ class RecordingService(QObject):
                 events.recording_error.disconnect()
             except (TypeError, RuntimeError):
                 pass  # Ignore if signals were already disconnected
-            self._recording_thread.deleteLater()
+
+            # Stop and clean up old thread
+            if self._recording_thread.is_alive():
+                self._recording_thread.stop_recording()
+            self._recording_thread = None
 
         # Create new thread
-        self._recording_thread = RecordingThread(self)
+        self._recording_thread = RecordingThread()
         events.recording_started.connect(self._on_recording_started)
         events.recording_stopped.connect(self._on_recording_stopped)
         events.recording_error.connect(self._on_recording_error)
@@ -208,12 +204,9 @@ class RecordingService(QObject):
                 if self._is_recording:
                     self._recording_thread.stop_recording()
 
-                # Stop and wait for thread
-                self._recording_thread.stop()
-                self._recording_thread.wait()
-
-                # Clean up thread
-                self._recording_thread.deleteLater()
+                # Wait for thread to finish
+                if self._recording_thread.is_alive():
+                    self._recording_thread.join(timeout=2.0)
                 self._recording_thread = None
 
             except Exception as e:

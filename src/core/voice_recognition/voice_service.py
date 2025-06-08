@@ -233,30 +233,54 @@ class VoiceService(QObject):
                 self.audio_queue.get_nowait()
             except queue.Empty:
                 break
+
         # Stop audio stream if it exists
         try:
             sd.stop()
         except Exception as e:
             logger.error(f"Error stopping audio stream: {e}")
 
-        # Join threads with timeout
+        # Join threads with timeout and force stop if necessary
         if self.thread:
-            self.thread.join(timeout=1.0)
-            if self.thread.is_alive():
-                logger.warning(
-                    "Warning: Audio processing thread did not terminate gracefully"
-                )
-            self.thread = None
+            try:
+                self.thread.join(timeout=2.0)
+                if self.thread.is_alive():
+                    logger.warning(
+                        "Audio processing thread did not terminate gracefully, forcing stop"
+                    )
+                    # Force stop by setting is_running to False again
+                    self.is_running = False
+                    self.thread.join(timeout=1.0)
+            except Exception as e:
+                logger.error(f"Error stopping audio processing thread: {e}")
+            finally:
+                self.thread = None
 
         if self.audio_thread:
-            self.audio_thread.join(timeout=2.0)
-            if self.audio_thread.is_alive():
-                logger.warning(
-                    "Warning: Audio recording thread did not terminate gracefully"
-                )
-            self.audio_thread = None
+            try:
+                self.audio_thread.join(timeout=2.0)
+                if self.audio_thread.is_alive():
+                    logger.warning(
+                        "Audio recording thread did not terminate gracefully, forcing stop"
+                    )
+                    # Force stop by setting is_running to False again
+                    self.is_running = False
+                    self.audio_thread.join(timeout=1.0)
+            except Exception as e:
+                logger.error(f"Error stopping audio recording thread: {e}")
+            finally:
+                self.audio_thread = None
 
         logger.info("Voice recognition service stopped")
+
+    def cleanup(self):
+        """Clean up resources before application exit."""
+        self.stop()
+        # Additional cleanup if needed
+        if self.model:
+            self.model = None
+        if self.recognizer:
+            self.recognizer = None
 
     def _start_audio_recording(self):
         """Start recording audio in a separate thread."""

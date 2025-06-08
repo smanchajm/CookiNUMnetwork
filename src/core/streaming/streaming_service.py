@@ -2,26 +2,24 @@ import requests
 import subprocess
 import socket
 import time
+import threading
 from typing import Optional
 
-from PyQt6.QtCore import QObject, QThread, pyqtSignal
+from PyQt6.QtCore import QObject, pyqtSignal
 
 from src.core.event_handler import events
 from src.core.logging_config import logger
 from src.utils.resource_manager import ResourceManager
 
 
-class StreamWaiterThread(QThread):
+class StreamWaiterThread(threading.Thread):
     """Thread to wait for stream availability without blocking UI."""
 
-    stream_available = pyqtSignal()
-    stream_error = pyqtSignal(str)
-    stream_stopped = pyqtSignal()  # New signal for stream stop
-
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__(daemon=True)
         self._is_running = True
         self._was_streaming = False
+        self._parent = parent
 
     def stop(self):
         """Stop the thread."""
@@ -40,15 +38,16 @@ class StreamWaiterThread(QThread):
                     if has_stream and not self._was_streaming:
                         logger.info("RTMP stream is available")
                         self._was_streaming = True
-                        self.stream_available.emit()
+                        events.streaming_started.emit()
                     elif not has_stream and self._was_streaming:
                         logger.info("RTMP stream is no longer available")
                         self._was_streaming = False
-                        self.stream_stopped.emit()
+                        events.streaming_stopped.emit()
                 else:
                     logger.warning(f"API returned status code {response.status_code}")
             except Exception as e:
-                self.stream_error.emit(f"Error checking stream: {str(e)}")
+                logger.error(f"Error checking stream: {str(e)}")
+                events.streaming_error.emit(f"Error checking stream: {str(e)}")
                 return
             time.sleep(0.5)  # Reduce check interval
 
@@ -96,15 +95,11 @@ class StreamingService(QObject):
         """
         if self.stream_waiter is not None:
             self.stream_waiter.stop()
-            self.stream_waiter.wait()
-            self.stream_waiter.deleteLater()
+            if self.stream_waiter.is_alive():
+                self.stream_waiter.join(timeout=2.0)
+            self.stream_waiter = None
 
         self.stream_waiter = StreamWaiterThread(self)
-        self.stream_waiter.stream_available.connect(self._on_stream_available)
-        self.stream_waiter.stream_error.connect(self._on_stream_error)
-        self.stream_waiter.stream_stopped.connect(
-            self._on_stream_stopped
-        )  # Connect new signal
         self.stream_waiter.start()
 
     def _on_stream_available(self):
@@ -171,8 +166,8 @@ class StreamingService(QObject):
         try:
             if self.stream_waiter is not None:
                 self.stream_waiter.stop()
-                self.stream_waiter.wait()
-                self.stream_waiter.deleteLater()
+                if self.stream_waiter.is_alive():
+                    self.stream_waiter.join(timeout=2.0)
                 self.stream_waiter = None
 
             if self.mediamtx_process is not None:
