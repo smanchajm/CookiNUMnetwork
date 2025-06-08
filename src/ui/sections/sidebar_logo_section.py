@@ -38,7 +38,7 @@ class LogoSection(QWidget):
 
     def _load_svg(self, logo_path):
         """Loads the SVG file."""
-        self.svg_widget.load(logo_path)
+        self.svg_widget.load(str(logo_path))
         if self.width() > 0:
             self.update_logo_size(self.width())
         else:

@@ -29,7 +29,7 @@ class ActionButton(QPushButton):
 
     def _setup_icon(self, icon_path: str):
         """Loads and sets the button icon."""
-        icon = QIcon(icon_path)
+        icon = QIcon(str(icon_path))
         if not icon.isNull():
             self.setIcon(icon)
             self.setIconSize(self._icon_size)

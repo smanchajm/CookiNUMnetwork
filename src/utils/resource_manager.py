@@ -9,6 +9,7 @@ import os
 import socket
 import sys
 from pathlib import Path
+from typing import Union, Tuple
 
 
 class ResourceManager:
@@ -17,8 +18,24 @@ class ResourceManager:
     APP_NAME = "CookiNUM"
 
     # Streaming configuration
-    STREAMING_RTMP_URL = "rtmp://localhost:1935/live/stream"
-    STREAMING_RTSP_URL = "rtsp://localhost:8554/live/stream"
+    STREAMING_HOST = "localhost"
+    STREAMING_RTMP_PORT = 1935
+    STREAMING_RTSP_PORT = 8554
+    STREAMING_PATH = Path("live/stream")
+
+    @staticmethod
+    def _get_streaming_url(protocol: str, port: int) -> str:
+        """
+        Construit une URL de streaming avec le protocole et le port spécifiés.
+
+        Args:
+            protocol: Protocole de streaming (rtmp ou rtsp)
+            port: Port du serveur de streaming
+
+        Returns:
+            str: URL de streaming complète
+        """
+        return f"{protocol}://{ResourceManager.STREAMING_HOST}:{port}/{ResourceManager.STREAMING_PATH}"
 
     @staticmethod
     def _is_pyinstaller_mode() -> bool:
@@ -89,7 +106,7 @@ class ResourceManager:
             path.mkdir(exist_ok=True)
 
     @staticmethod
-    def get_app_data_paths(ressource_name: str) -> Path:
+    def get_app_data_paths(ressource_name: Union[str, Path]) -> Path:
         """
         Obtient le chemin complet vers une ressource dans le répertoire de données de l'application.
 
@@ -117,14 +134,18 @@ class ResourceManager:
         """
         Obtient l'URL de streaming RTMP pour GoPro.
         """
-        return f"rtmp://localhost:1935/live/stream"
+        return ResourceManager._get_streaming_url(
+            "rtmp", ResourceManager.STREAMING_RTMP_PORT
+        )
 
     @staticmethod
     def get_gopro_rtsp_url() -> str:
         """
         Obtient l'URL de streaming RTSP pour GoPro.
         """
-        return f"rtsp://localhost:8554/live/stream"
+        return ResourceManager._get_streaming_url(
+            "rtsp", ResourceManager.STREAMING_RTSP_PORT
+        )
 
     @staticmethod
     def get_gopro_streaming_url() -> str:
@@ -134,22 +155,23 @@ class ResourceManager:
         Returns:
             str: URL de streaming GoPro
         """
-        return f'!MRTMP="rtmp://{ResourceManager.get_ipv4_address()}:1935/live/stream"=oW1mVr1080!W!GL'
+        ip_address = ResourceManager.get_ipv4_address()
+        return f'!MRTMP="rtmp://{ip_address}:{ResourceManager.STREAMING_RTMP_PORT}/{ResourceManager.STREAMING_PATH}"=oW1mVr1080!W!GL'
 
     @staticmethod
-    def get_resource_path(resource_name: str) -> Path:
+    def get_resource_path(resource_name: Union[str, Path]) -> Path:
         """
         Obtient le chemin complet vers une ressource.
 
         Args:
             resource_name: Nom de la ressource (chemin relatif depuis le dossier resources)
+                          Peut être une chaîne ou un Path
 
         Returns:
             Path: Chemin complet vers la ressource
         """
         try:
             if ResourceManager._is_pyinstaller_mode():
-                # Mode PyInstaller: accès direct aux fichiers dans le dossier temporaire
                 return (
                     ResourceManager._get_base_path()
                     / "src"
@@ -157,20 +179,22 @@ class ResourceManager:
                     / resource_name
                 )
             else:
-                # Mode développement: utilise importlib.resources
                 return Path(
-                    importlib.resources.files("src.resources").joinpath(resource_name)
+                    importlib.resources.files("src.resources").joinpath(
+                        str(resource_name)
+                    )
                 )
         except Exception as e:
             raise FileNotFoundError(f"Ressource non trouvée: {resource_name}") from e
 
     @staticmethod
-    def get_resource_content(resource_name: str) -> str:
+    def get_resource_content(resource_name: Union[str, Path]) -> str:
         """
         Lit le contenu d'une ressource texte.
 
         Args:
             resource_name: Nom de la ressource (chemin relatif depuis le dossier resources)
+                          Peut être une chaîne ou un Path
 
         Returns:
             str: Contenu de la ressource
@@ -182,12 +206,13 @@ class ResourceManager:
             raise FileNotFoundError(f"Ressource non trouvée: {resource_name}") from e
 
     @staticmethod
-    def get_resource_bytes(resource_name: str) -> bytes:
+    def get_resource_bytes(resource_name: Union[str, Path]) -> bytes:
         """
         Lit le contenu binaire d'une ressource.
 
         Args:
             resource_name: Nom de la ressource (chemin relatif depuis le dossier resources)
+                          Peut être une chaîne ou un Path
 
         Returns:
             bytes: Contenu binaire de la ressource
@@ -199,7 +224,7 @@ class ResourceManager:
             raise FileNotFoundError(f"Ressource non trouvée: {resource_name}") from e
 
     @staticmethod
-    def get_icon_path(icon_name: str) -> str:
+    def get_icon_path(icon_name: Union[str, Path]) -> Path:
         """
         Obtient le chemin vers une icône.
 
@@ -207,12 +232,12 @@ class ResourceManager:
             icon_name: Nom de l'icône (avec extension)
 
         Returns:
-            str: Chemin complet vers l'icône
+            Path: Chemin complet vers l'icône
         """
-        return str(ResourceManager.get_resource_path(f"icons/{icon_name}"))
+        return ResourceManager.get_resource_path(Path("icons") / icon_name)
 
     @staticmethod
-    def get_image_path(image_name: str) -> str:
+    def get_image_path(image_name: Union[str, Path]) -> Path:
         """
         Obtient le chemin vers une image.
 
@@ -220,12 +245,12 @@ class ResourceManager:
             image_name: Nom de l'image (avec extension)
 
         Returns:
-            str: Chemin complet vers l'image
+            Path: Chemin complet vers l'image
         """
-        return str(ResourceManager.get_resource_path(f"images/{image_name}"))
+        return ResourceManager.get_resource_path(Path("images") / image_name)
 
     @staticmethod
-    def get_sound_path(sound_name: str) -> str:
+    def get_sound_path(sound_name: Union[str, Path]) -> Path:
         """
         Obtient le chemin vers un son.
 
@@ -233,25 +258,25 @@ class ResourceManager:
             sound_name: Nom du fichier son (avec extension)
 
         Returns:
-            str: Chemin complet vers le fichier son
+            Path: Chemin complet vers le fichier son
         """
-        return str(ResourceManager.get_resource_path(f"sounds/{sound_name}"))
+        return ResourceManager.get_resource_path(Path("sounds") / sound_name)
 
     @staticmethod
-    def get_font_path(font_name: str) -> Path:
+    def get_font_path(font_name: Union[str, Path]) -> Path:
         """
         Obtient le chemin vers une police.
 
         Args:
-            font_xname: Nom de la police (avec extension)
+            font_name: Nom de la police (avec extension)
 
         Returns:
             Path: Chemin complet vers la police
         """
-        return ResourceManager.get_resource_path(f"fonts/{font_name}")
+        return ResourceManager.get_resource_path(Path("fonts") / font_name)
 
     @staticmethod
-    def get_font_dir(font_dir_name: str) -> Path:
+    def get_font_dir(font_dir_name: Union[str, Path]) -> Path:
         """
         Obtient le chemin vers un dossier de polices.
 
@@ -261,7 +286,7 @@ class ResourceManager:
         Returns:
             Path: Chemin complet vers le dossier de polices
         """
-        return ResourceManager.get_resource_path(f"fonts/{font_dir_name}")
+        return ResourceManager.get_resource_path(Path("fonts") / font_dir_name)
 
     @staticmethod
     def get_style_content() -> str:
@@ -271,20 +296,21 @@ class ResourceManager:
         Returns:
             str: Contenu du fichier de style
         """
-        return ResourceManager.get_resource_content("styles/styles.qss")
+        return ResourceManager.get_resource_content(Path("styles") / "styles.qss")
 
     @staticmethod
-    def get_mediamtx_args() -> Path:
+    def get_mediamtx_args() -> Tuple[Path, Path]:
         """
         Obtient le chemin vers le binaire exécutable de MediaMTX en fonction du système d'exploitation.
 
         Returns:
-            Path: Chemin complet vers le binaire exécutable de MediaMTX
+            Tuple[Path, Path]: Tuple contenant le chemin vers le binaire et le fichier de configuration
         """
         binary_name = "mediamtx.exe" if sys.platform == "win32" else "mediamtx"
-        return ResourceManager.get_resource_path(
-            f"binaries/mediamtx/{binary_name}"
-        ), ResourceManager.get_resource_path("binaries/mediamtx/mediamtx.yml")
+        return (
+            ResourceManager.get_resource_path(Path("binaries/mediamtx") / binary_name),
+            ResourceManager.get_resource_path(Path("binaries/mediamtx/mediamtx.yml")),
+        )
 
     @staticmethod
     def get_audio_model_path() -> Path:
@@ -295,5 +321,5 @@ class ResourceManager:
             Path: Chemin complet vers le modèle audio
         """
         return ResourceManager.get_resource_path(
-            "binaries/audio_model/vosk-model-small-fr-0.22"
+            Path("binaries/audio_model/vosk-model-small-fr-0.22")
         )
