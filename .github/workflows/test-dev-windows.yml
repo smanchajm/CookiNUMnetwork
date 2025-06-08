@@ -53,7 +53,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) {
             Write-Error "App crashed with exit code $LASTEXITCODE"
             exit $LASTEXITCODE
-            }
+          }
 
       - name: Print log preview
         shell: powershell
