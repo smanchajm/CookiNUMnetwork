@@ -43,6 +43,7 @@ jobs:
       - name: Run app in dev mode (capturing output)
         shell: powershell
         run: |
+          $env:PYTHONPATH = "src"
           $logDir = "logs"
           New-Item -ItemType Directory -Force -Path $logDir | Out-Null
 <<<<<<< HEAD
