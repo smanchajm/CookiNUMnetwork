@@ -19,7 +19,3 @@ num2words==0.5.12
 
 # QR Code
 qrcode>=7.3.1
-
-
-# Packaging
-pyinstaller>=5.13.0 

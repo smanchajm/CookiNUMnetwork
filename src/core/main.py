@@ -20,13 +20,12 @@ def main():
     font = QFont()
     font.setPixelSize(12)
     app.setFont(font)
+    add_fonts()
 
     if sys.platform == "win32":
         # This line is essential for the icon to appear in the taskbar
         appID = "UPEC.CookinNUMnetwork.0.1"
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(appID)
-
-    add_fonts()
 
     # Load styles via StyleManager
     styles = StyleManager.load_styles()
@@ -36,7 +35,7 @@ def main():
     ResourceManager.create_app_data_paths()
     logger.info(ResourceManager.get_ipv4_address())
     window = MainWindow()
-    controller = MainController(window)
+    MainController(window)
 
     window.showMaximized()
     app.setActiveWindow(window)

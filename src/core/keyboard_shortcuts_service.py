@@ -33,7 +33,7 @@ class KeyboardShortcutsService:
         self._add_shortcut("T", events.add_tag_clicked.emit)
 
         # File shortcuts
-        self._add_shortcut("Ctrl+O", events.open_video_clicked.emit)
+        self._add_shortcut("O", events.open_video_clicked.emit)
 
     def _add_shortcut(self, key_sequence: str, callback, *args):
         """
