@@ -81,17 +81,13 @@ class WiFiConnectionDialog(QDialog):
         layout.addWidget(self.close_button)
 
     def generate_qrcode(self):
-        # ssid = self.ssid_input.text().strip()
-        # password = self.password_input.text()
-
-        ssid = "iPhone de Samuel"
-        password = "samlepompierutc"
+        ssid = self.ssid_input.text().strip()
+        password = self.password_input.text()
 
         if not ssid:
             self.status_label.setText("Veuillez entrer un nom de réseau (SSID)")
             return
 
-        # Générer le QR code avec le service GoPro
         qrcode_file = self.gopro_service.generate_wifi_qrcode(ssid, password)
 
         # Afficher le QR code généré
