@@ -1,0 +1,333 @@
+/* ================= Colors (Adaptée à la charte CookiNUM Desktop Light) ================= */
+/*
+Palette :
+- Bleu primaire : #172ec2
+- Bleu texte : #0a062f;
+- Framboise secondaire : #b5183d
+- Jaune accent : #ffca29
+- Gris clair : #f9fafb, #f3f4f6, #e5e7eb,rgb(203, 205, 207); 
+- Texte principal : #1f2937
+- Texte secondaire : #4b5563
+- Bordure : #e5e7eb
+*/
+
+/* ================= Base Styles ================= */
+* {
+    font-family: "Geist";
+    font-size: 16px;
+    font-weight: 500;
+    background-color: #fff;
+    color: #0a062f;
+}
+
+
+QMainWindow {
+    background-color: #ffffff;
+}
+
+/* ================= Sidebar Styles ================= */
+#sidebar {
+    background-color: #ffffff;
+    border-right: 1px solid #e5e7eb;
+    padding: 16px;
+}
+
+#sidebar #logo_section {
+    border-radius: 6px;
+    padding: 12px;
+}
+
+/* Action Buttons */
+ActionButton {
+    font-size: 14px;
+    font-weight: 500;
+    color: #0a062f;
+    background-color: transparent;
+    border: 1px solid #e5e7eb;
+    padding: 10px 16px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+}
+
+ActionButton:hover {
+    background-color: #f3f4f6;
+}
+
+ActionButton[class="primary_button"] {
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    background-color: #172ec2;
+    border: none;
+    padding: 8px 16px;
+}
+
+ActionButton[class="primary_button"]:hover {
+    background-color: #0f1ea8;
+}
+
+ActionButton[class="primary_button"]:pressed {
+    background-color: #0a157a;
+}
+
+ActionButton[class="secondary_button"] {
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    background-color: #b5183d;
+    padding: 12px 20px;
+    border: none;
+}
+
+ActionButton[class="secondary_button"]:hover {
+    background-color: #9d1636;
+}
+
+ActionButton[class="secondary_button"]:pressed {
+    background-color: #7e112e;
+}
+
+
+/* === Mode Buttons (discret mais visibles) === */
+ActionButton[class="mode_button"] {
+    font-size: 16px;
+    font-weight: 500;
+    background-color: transparent;
+    color: #0a062f;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 12px;
+    margin-bottom: 5px;
+}
+
+/* Styles pour les boutons de mode actifs/inactifs */
+ActionButton[class="mode_button"][active="true"] {
+    background-color: #dbeafe;
+}
+
+ActionButton[class="mode_button"][active="false"] {
+    background-color: #fff;
+}
+
+ActionButton[class="mode_button"][active="false"]:hover {
+    background-color:rgb(245, 249, 255);
+}
+
+
+/* === Action Button (encore plus léger) === */
+ActionButton[class="action_button"] {
+    font-size: 14px;
+    font-weight: 500;
+    background-color: transparent;
+    color: #0a062f;
+    border: 1px solid #cbd5e1;
+    padding: 5px 10px;
+    border-radius: 12px;
+    margin-bottom: 5px;
+}
+
+ActionButton[class="action_button"]:hover {
+    background-color: #f8fafc;
+}
+
+ActionButton[class="action_button"]:pressed {
+    background-color: #e2e8f0;
+}
+
+/* === Ajouter un tag (doit ressortir) === */
+ActionButton#add_tag_button {
+    background-color: #facc15;  /* jaune contrastant */
+    color: #0a062f;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 10px;
+    margin: 10px 0;
+}
+
+ActionButton#add_tag_button:hover {
+    background-color: #eab308;
+}
+
+/* === Tags et timecodes (petits, discrets) === */
+/* Suppression de la définition générique qui pourrait causer des conflits */
+
+#sidebar #tag_section {
+    min-height: 100px;
+}
+
+#sidebar #tag_section #tag_list_title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #070737;
+    padding: 0 4px;
+    margin-bottom: 16px;
+}
+
+#sidebar #tag_section ActionButton#add_tag_button {
+    background-color: #ffca29;
+    color: #1f2937;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    qproperty-cursor: PointingHandCursor;
+}
+
+#sidebar #tag_section ActionButton#add_tag_button:hover {
+    background-color: #facc15;
+}
+
+#sidebar #tag_section ActionButton#add_tag_button:pressed {
+    background-color: #eab308;
+}
+
+#sidebar #tag_section #tag_scroll_area, 
+#sidebar #tag_section #tag_scroll_area > #scroll_widget,
+#sidebar #tag_section #tag_scroll_area QWidget,
+#sidebar #tag_section QScrollArea,
+#sidebar #tag_section QScrollArea > QWidget,
+#sidebar #tag_section QScrollArea > QAbstractScrollArea,
+#sidebar #tag_section QScrollArea > QAbstractScrollArea > QWidget,
+#sidebar #tag_section QScrollArea > QAbstractScrollArea > QWidget#qt_scrollarea_viewport {
+    background: #fff;
+}
+
+#sidebar #tag_section #tag_item_label {
+    font-size: 14px;
+    color: #0a062f;
+    background-color: transparent;
+    padding: 12px 5px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+}
+
+#sidebar #tag_section #delete_tag_button {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    border-radius: 6px;
+    margin: 0 5px;
+    min-width: 24px;
+    min-height: 24px;
+    max-width: 24px;
+    max-height: 24px;
+}
+
+#sidebar #tag_section #tag_item_label:hover {
+    background-color: #f3f4f6;
+}
+
+/* ================= Content Area ================= */
+#content_area {
+    background-color: #f9fafb;
+    margin: 0;
+    padding: 16px;
+}
+
+/* ================= Media Controls ================= */
+#media_controls QPushButton {
+    background-color: transparent;
+    border: none;
+    padding: 12px;
+    margin: 0 24px;
+}
+
+QLabel#recording_indicator {
+    background-color: #b5183d;
+    color: white;
+    border-radius: 15px;
+    padding: 5px 10px;
+    margin: 25px;
+    font-weight: 500;
+    font-size: 14px;
+    min-width: 80px;
+    min-height: 20px;
+    text-align: center;
+    qproperty-alignment: AlignCenter;
+}
+
+/* ================= Scroll Bar Styles ================= */
+QScrollBar:vertical {
+    border: none;
+    background: transparent;
+    width: 8px;
+    margin: 0;
+}
+
+QScrollBar::groove:vertical {
+    background: transparent;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical {
+    background: #e5e7eb;
+    border-radius: 4px;
+    min-height: 20px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #d1d5db;
+}
+
+QScrollBar::handle:vertical:pressed {
+    background: #9ca3af;
+}
+
+QScrollBar::add-line:vertical,
+#tag_scroll_area QScrollBar::sub-line:vertical {
+    border: none;
+    background: none;
+    height: 0;
+    width: 0;
+}
+
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+/* ================= Slider Bar Styles ================= */
+#media_controls QSlider {
+    margin: 0 24px 24px 24px;
+}
+
+QSlider::groove:horizontal {
+    border: none;
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal {
+    background: transparent;
+    border: none;
+    width: 0;
+    height: 0;
+    margin: 0;
+}
+
+QSlider::sub-page:horizontal {
+    background: #172ec2;
+    border: none;
+    border-radius: 4px;
+}
+
+QSlider::add-page:horizontal {
+    background: transparent;
+    border: none;
+}
+
+
+
+#instructions_label {
+    color: #666666;
+    font-size: 18px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px;
+} 

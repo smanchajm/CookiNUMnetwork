@@ -1,0 +1,64 @@
+name: Test macos app in dev mode with logs
+
+on:
+  push:
+    branches: [macos_installer]
+
+jobs:
+  test-dev:
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Run app in dev mode (non blocking)
+        run: |
+          LOG_DIR="logs"
+          mkdir -p "$LOG_DIR"
+          # Lance l'app en arrière-plan
+          python src/core/main.py &
+          APP_PID=$!
+          sleep 15
+          if ps -p $APP_PID > /dev/null; then
+            echo "App started successfully in dev mode"
+            kill $APP_PID
+          else
+            echo "App failed to start" && exit 1
+          fi
+
+      - name: Print log preview
+        run: |
+          LOG_FILE="logs/cookinum.log"
+          echo "===== Log preview ====="
+          if [ -f "$LOG_FILE" ]; then
+            tail -n 30 "$LOG_FILE"
+          else
+            echo "No log file found"
+          fi
+
+      - name: Upload app logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: DevApp-logs
+          path: src/resources/logs/

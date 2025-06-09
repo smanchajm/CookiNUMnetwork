@@ -6,7 +6,7 @@ __pycache__/
 *.so
 *.egg-info/
 *.egg
-*.log
+# *.log
 
 # Environnements virtuels
 .venv/
@@ -35,9 +35,9 @@ ENV/
 Thumbs.db
 
 # Installateurs
-*.exe
-*.dmg
-*.AppImage
+# *.exe
+# *.dmg
+# *.AppImage
 
 # Fichiers temporaires divers
 *.tmp
@@ -56,10 +56,10 @@ Thumbs.db
 # Old version
 old_CookiNUMnetwork
 temp
-ressources/mediamtx/mediamtx.yml
-ressources/mediamtx/LICENSE
+# ressources/mediamtx/mediamtx.yml
+# ressources/mediamtx/LICENSE
 # Ressources directory
-ressources/
+# ressources/
 
 # PyInstaller
 dist/
@@ -72,6 +72,6 @@ build/
 
 tags/
 video_files/
-resources/
+# resources/
 
 

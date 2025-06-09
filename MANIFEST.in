@@ -1,0 +1,3 @@
+recursive-include src/resources *
+recursive-include src/resources/icons *
+recursive-include src/resources/styles * 
