@@ -69,3 +69,20 @@ jobs:
         with:
           name: DevApp-logs-macOS
           path: logs/
+
+      - name: Build installer
+        run: |
+          pyinstaller CookiNUMnetwork.spec
+          # Vérifier que l'app a été créée
+          if [ -d "dist/CookiNUMnetwork.app" ]; then
+            echo "✅ App built successfully"
+          else
+            echo "❌ App build failed"
+            exit 1
+          fi
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: CookiNUMnetwork-macOS
+          path: dist/CookiNUMnetwork.app
