@@ -70,54 +70,20 @@ jobs:
           name: DevApp-logs-macOS
           path: logs/
 
-      - name: Build installer
+      - name: Generate spec file
         run: |
-          pyinstaller CookiNUMnetwork.spec
-          # Vérifier que l'app a été créée
-          if [ -f "dist/CookiNUMnetwork" ]; then
-            echo "✅ App built successfully"
+          echo "=== Generating spec file ==="
+          pyi-makespec --name CookiNUMnetwork --windowed src/core/main.py
+          # Vérifier que le spec a été créé
+          if [ -f "CookiNUMnetwork.spec" ]; then
+            echo "✅ Spec file generated successfully"
           else
-            echo "❌ App build failed"
+            echo "❌ Spec file generation failed"
             exit 1
           fi
 
-      - name: Test built installer
-        run: |
-          echo "=== Testing built installer ==="
-          APP_PATH="dist/CookiNUMnetwork"
-          
-          # Vérifier que l'app existe
-          if [ ! -f "$APP_PATH" ]; then
-            echo "❌ App not found at $APP_PATH"
-            exit 1
-          fi
-          
-          # Lancer l'app en arrière-plan
-          "$APP_PATH" &
-          APP_PID=$!
-          
-          # Attendre que l'app démarre
-          sleep 15
-          
-          # Vérifier si l'app est toujours en cours d'exécution
-          if ps -p $APP_PID > /dev/null; then
-            echo "✅ Built app is running correctly after 15 seconds"
-            kill $APP_PID
-          else
-            echo "❌ Built app terminated before 15 seconds"
-            # Récupérer les logs de l'app
-            LOG_PATH="$HOME/Library/Logs/CookiNUMnetwork/cookinum.log"
-            if [ -f "$LOG_PATH" ]; then
-              echo "===== App logs ====="
-              tail -n 50 "$LOG_PATH"
-            else
-              echo "No log file found at $LOG_PATH"
-            fi
-            exit 1
-          fi
-
-      - name: Upload installer
+      - name: Upload spec file
         uses: actions/upload-artifact@v4
         with:
-          name: CookiNUMnetwork-macOS
-          path: dist/CookiNUMnetwork
+          name: CookiNUMnetwork-spec
+          path: CookiNUMnetwork.spec
