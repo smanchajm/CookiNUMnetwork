@@ -3,6 +3,7 @@ import subprocess
 import socket
 import time
 import threading
+import platform
 from typing import Optional
 
 from PyQt6.QtCore import QObject, pyqtSignal
@@ -135,9 +136,15 @@ class StreamingService(QObject):
 
             logger.info("Launching MediaMTX")
             logger.info(ResourceManager.get_mediamtx_args())
+
+            # Set process creation flags based on platform
+            creation_flags = (
+                subprocess.CREATE_NO_WINDOW if platform.system() == "Windows" else 0
+            )
+
             self.mediamtx_process = subprocess.Popen(
                 ResourceManager.get_mediamtx_args(),
-                creationflags=subprocess.CREATE_NO_WINDOW,
+                creationflags=creation_flags,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
             )
