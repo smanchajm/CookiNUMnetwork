@@ -127,4 +127,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: CookiNUMnetwork-macOS
-          path: dist/CookiNUMnetwork.app
+          path: dist
