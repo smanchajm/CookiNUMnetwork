@@ -13,16 +13,19 @@ resources_datas = [
     if f.is_file()
 ]
 
+# Ajouter le répertoire src au PYTHONPATH
+src_path = os.path.abspath('src')
+os.environ['PYTHONPATH'] = src_path + os.pathsep + os.environ.get('PYTHONPATH', '')
 
 a = Analysis(
     ['src/core/main.py'],
-    pathex=['src'],
+    pathex=[src_path],  # Ajouter src au path
     binaries=[],
     datas=[
         *vosk_datas,
         *resources_datas,
     ],
-    hiddenimports=[],
+    hiddenimports=['src.core'],  # Ajouter explicitement le module src.core
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
