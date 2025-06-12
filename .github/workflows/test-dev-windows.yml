@@ -45,6 +45,7 @@ jobs:
         run: |
           $logDir = "logs"
           New-Item -ItemType Directory -Force -Path $logDir | Out-Null
+<<<<<<< HEAD
       
           Write-Host "=== Lancement de l'app ==="
           $process = Start-Process -FilePath "python" -ArgumentList "-m src.core.main" -NoNewWindow -PassThru
@@ -58,9 +59,26 @@ jobs:
             Stop-Process -Id $process.Id -Force
           } else {
             Write-Error "App terminated before 15 seconds ❌"
+=======
+
+          # Lance le process et capture l'objet
+          $process = Start-Process -FilePath "python" `
+                                  -ArgumentList "src/core/main.py" `
+                                  -WindowStyle Hidden `
+                                  -PassThru
+
+          Start-Sleep -Seconds 20
+
+          if ($process.HasExited -eq $false) {
+            Write-Host "App started successfully in dev mode"
+            $process.Kill()
+          } else {
+            Write-Error "App failed to start (crashed immediately)"
+>>>>>>> b6cadad (repair workflow)
             exit 1
           }
         
+
 
       - name: Print log preview
         shell: powershell
