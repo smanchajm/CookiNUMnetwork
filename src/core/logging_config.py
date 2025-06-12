@@ -19,8 +19,8 @@ def setup_logging():
     Creates the logs directory if it doesn't exist and sets up file and console handlers.
     """
     # Create logs directory if it doesn't exist
-    LOG_DIR.mkdir(exist_ok=True)
-
+    # LOG_DIR.mkdir(exist_ok=True)
+    print(LOG_DIR)
     logging.basicConfig(
         level=LOG_LEVEL,
         format=LOG_FORMAT,
