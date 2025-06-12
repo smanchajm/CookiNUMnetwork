@@ -70,6 +70,11 @@ jobs:
           name: DevApp-logs-macOS
           path: logs/
 
+      - name: Install PyInstaller from develop branch with custom bootloader
+        run: |
+          pip uninstall -y pyinstaller
+          PYINSTALLER_COMPILE_BOOTLOADER=1 pip install git+https://github.com/pyinstaller/pyinstaller.git@develop
+
       - name: Build installer
         run: |
           pyinstaller CookiNUMnetwork.spec
