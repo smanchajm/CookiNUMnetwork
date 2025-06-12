@@ -1,5 +1,6 @@
 import ctypes
 import sys
+import os
 
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import QApplication
@@ -13,6 +14,9 @@ from src.utils.resource_manager import ResourceManager
 
 
 def main():
+    # Disable location services by setting environment variable
+    os.environ["QT_DISABLE_LOCATION"] = "1"
+
     app = QApplication([])
     app.setApplicationName("CookinNUMnetwork")
 
