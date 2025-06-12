@@ -45,14 +45,30 @@ jobs:
         run: |
           $logDir = "logs"
           New-Item -ItemType Directory -Force -Path $logDir | Out-Null
-
+      
           Write-Host "=== Lancement de l'app ==="
+<<<<<<< HEAD
           python -m src.core.main
           Start-Sleep -Seconds 20
           if ($LASTEXITCODE -ne 0) {
             Write-Error "App crashed with exit code $LASTEXITCODE"
             exit $LASTEXITCODE
+=======
+          $process = Start-Process -FilePath "python" -ArgumentList "-m src.core.main" -NoNewWindow -PassThru
+      
+          # Attendre 15 secondes
+          Start-Sleep -Seconds 15
+      
+          # Vérifier que le processus tourne toujours
+          if (Get-Process -Id $process.Id -ErrorAction SilentlyContinue) {
+            Write-Host "App is running correctly after 15 seconds ✅"
+            Stop-Process -Id $process.Id -Force
+          } else {
+            Write-Error "App terminated before 15 seconds ❌"
+            exit 1
+>>>>>>> 1829dfc (add job success)
           }
+        
 
       - name: Print log preview
         shell: powershell
