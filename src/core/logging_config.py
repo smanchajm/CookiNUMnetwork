@@ -7,6 +7,7 @@ import logging
 from src.utils.resource_manager import ResourceManager
 
 # Logging configuration
+ResourceManager.create_app_data_paths()
 LOG_LEVEL = logging.INFO
 LOG_FORMAT = "%(levelname)s - %(message)s"
 LOG_DIR = ResourceManager.get_app_data_paths("logs")
@@ -19,8 +20,8 @@ def setup_logging():
     Creates the logs directory if it doesn't exist and sets up file and console handlers.
     """
     # Create logs directory if it doesn't exist
-    LOG_DIR.mkdir(exist_ok=True)
-
+    # LOG_DIR.mkdir(exist_ok=True)
+    print(LOG_DIR)
     logging.basicConfig(
         level=LOG_LEVEL,
         format=LOG_FORMAT,
