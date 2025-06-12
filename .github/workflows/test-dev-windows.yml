@@ -1,12 +1,12 @@
-name: Test app Windows in dev mode with logs
+name: Test windows app in dev mode with logs
 
 on:
   push:
     branches: [windows_installer]
 
 jobs:
-  test-dev-windows:
-    runs-on: windows-2022
+  test-dev:
+    runs-on: windows-latest
 
     steps:
       - name: Checkout repository
@@ -25,14 +25,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      - name: Install VLC
-        shell: powershell
-        run: |
-          Set-ExecutionPolicy Bypass -Scope Process -Force
-          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-          iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-          choco install vlc -y --no-progress
-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -40,42 +32,65 @@ jobs:
           pip install -r requirements-dev.txt
           pip install -e .
 
-      - name: Run app in dev mode (capturing output)
-        shell: powershell
+      - name: Run app in dev mode (non blocking)
         run: |
-          $logDir = "logs"
-          New-Item -ItemType Directory -Force -Path $logDir | Out-Null
-      
-          Write-Host "=== Lancement de l'app ==="
-          $process = Start-Process -FilePath "python" -ArgumentList "-m src.core.main" -NoNewWindow -PassThru
-      
-          # Attendre 15 secondes
-          Start-Sleep -Seconds 15
-      
-          # Vérifier que le processus tourne toujours
-          if (Get-Process -Id $process.Id -ErrorAction SilentlyContinue) {
-            Write-Host "App is running correctly after 15 seconds ✅"
-            Stop-Process -Id $process.Id -Force
-          } else {
-            Write-Error "App terminated before 15 seconds ❌"
+          mkdir logs
+          echo "=== Lancement de l'app ==="
+          start /B python -m src.core.main
+          timeout /T 15
+          tasklist | findstr python || (
+            echo App terminated before 15 seconds ❌
             exit 1
-          }
-        
+          )
+          echo App is running correctly after 15 seconds ✅
+          taskkill /IM python.exe /F
 
       - name: Print log preview
-        shell: powershell
         run: |
-          $logFile = "logs/cookinum.log"
-          Write-Host "===== Log preview ====="
-          if (Test-Path $logFile) {
-            Get-Content $logFile -Tail 30
-          } else {
-            Write-Host "No log file found"
-          }
+          echo ===== Log preview =====
+          if exist logs\cookinum.log (
+            type logs\cookinum.log
+          ) else (
+            echo No log file found
+          )
 
       - name: Upload app logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: DevApp-logs-Windows
-          path: logs/
+          path: logs\
+
+      - name: Build installer
+        run: |
+          pyinstaller CookiNUMnetwork.spec
+          if exist dist\CookiNUMnetwork\CookiNUMnetwork.exe (
+            echo ✅ .exe built successfully
+          ) else (
+            echo ❌ Build failed
+            exit 1
+          )
+
+      - name: Test built installer
+        run: |
+          echo === Testing built installer ===
+          start /B dist\CookiNUMnetwork\CookiNUMnetwork.exe
+          timeout /T 15
+          tasklist | findstr CookiNUMnetwork || (
+            echo ❌ Built app terminated before 15 seconds
+            if exist "%APPDATA%\CookiNUM\logs\cookinum.log" (
+              echo ===== App logs =====
+              type "%APPDATA%\CookiNUM\logs\cookinum.log"
+            ) else (
+              echo No log file found at %APPDATA%\CookiNUM\logs\cookinum.log
+            )
+            exit 1
+          )
+          echo ✅ Built app is running correctly after 15 seconds
+          taskkill /IM CookiNUMnetwork.exe /F
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: CookiNUMnetwork-Windows
+          path: dist\CookiNUMnetwork\
