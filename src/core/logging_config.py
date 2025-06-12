@@ -4,12 +4,12 @@ Handles the setup and configuration of the application's logging system.
 """
 
 import logging
-from pathlib import Path
+from src.utils.resource_manager import ResourceManager
 
 # Logging configuration
 LOG_LEVEL = logging.INFO
 LOG_FORMAT = "%(levelname)s - %(message)s"
-LOG_DIR = Path("logs")
+LOG_DIR = ResourceManager.get_app_data_paths("logs")
 LOG_FILE = LOG_DIR / "cookinum.log"
 
 

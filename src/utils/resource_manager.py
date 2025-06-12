@@ -100,6 +100,7 @@ class ResourceManager:
             "videos": app_data_path / "videos",
             "tags": app_data_path / "tags",
             "qrcode": app_data_path / "qrcode",
+            "logs": app_data_path / "logs",
         }
 
         for path in subdirs.values():
