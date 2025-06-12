@@ -7,6 +7,7 @@ import logging
 from src.utils.resource_manager import ResourceManager
 
 # Logging configuration
+ResourceManager.create_app_data_paths()
 LOG_LEVEL = logging.INFO
 LOG_FORMAT = "%(levelname)s - %(message)s"
 LOG_DIR = ResourceManager.get_app_data_paths("logs")
