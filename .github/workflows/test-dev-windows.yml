@@ -1,4 +1,4 @@
-name: Test windows app in dev mode with logs
+name: Test Windows app in dev mode with logs
 
 on:
   push:
@@ -33,64 +33,63 @@ jobs:
           pip install -e .
 
       - name: Run app in dev mode (non blocking)
+        shell: cmd
         run: |
           mkdir logs
-          echo "=== Lancement de l'app ==="
+          echo === Lancement de l'app ===
           start /B python -m src.core.main
           timeout /T 15
-          tasklist | findstr python || (
+          tasklist | findstr python >nul
+          if errorlevel 1 (
             echo App terminated before 15 seconds ❌
             exit 1
+          ) else (
+            echo App is running correctly after 15 seconds ✅
+            taskkill /IM python.exe /F
           )
-          echo App is running correctly after 15 seconds ✅
-          taskkill /IM python.exe /F
 
       - name: Print log preview
         run: |
-          echo ===== Log preview =====
-          if exist logs\cookinum.log (
-            type logs\cookinum.log
-          ) else (
-            echo No log file found
-          )
+          $logPath = "logs/cookinum.log"
+          if (Test-Path $logPath) {
+            Write-Host "===== Log preview ====="
+            Get-Content $logPath -Tail 30
+          } else {
+            Write-Host "No log file found"
+          }
+        shell: pwsh
 
       - name: Upload app logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: DevApp-logs-Windows
-          path: logs\
+          name: DevApp-logs-windows
+          path: logs/
 
-      - name: Build installer
+      - name: Build installer (PyInstaller)
+        run: pyinstaller CookiNUMnetwork.spec
+
+      - name: Test built executable
+        shell: cmd
         run: |
-          pyinstaller CookiNUMnetwork.spec
-          if exist dist\CookiNUMnetwork\CookiNUMnetwork.exe (
-            echo ✅ .exe built successfully
-          ) else (
-            echo ❌ Build failed
+          echo === Testing built EXE ===
+          if not exist dist\CookiNUMnetwork\CookiNUMnetwork.exe (
+            echo ❌ EXE not found in dist\
             exit 1
           )
-
-      - name: Test built installer
-        run: |
-          echo === Testing built installer ===
           start /B dist\CookiNUMnetwork\CookiNUMnetwork.exe
           timeout /T 15
-          tasklist | findstr CookiNUMnetwork || (
-            echo ❌ Built app terminated before 15 seconds
-            if exist "%APPDATA%\CookiNUM\logs\cookinum.log" (
-              echo ===== App logs =====
-              type "%APPDATA%\CookiNUM\logs\cookinum.log"
-            ) else (
-              echo No log file found at %APPDATA%\CookiNUM\logs\cookinum.log
-            )
+          tasklist | findstr CookiNUMnetwork.exe >nul
+          if errorlevel 1 (
+            echo ❌ App terminated before 15 seconds
             exit 1
+          ) else (
+            echo ✅ EXE is running correctly after 15 seconds
+            taskkill /IM CookiNUMnetwork.exe /F
           )
-          echo ✅ Built app is running correctly after 15 seconds
-          taskkill /IM CookiNUMnetwork.exe /F
 
-      - name: Upload installer
+      - name: Upload built EXE
         uses: actions/upload-artifact@v4
         with:
-          name: CookiNUMnetwork-Windows
-          path: dist\CookiNUMnetwork\
+          name: CookiNUMnetwork-windows
+          path: dist/CookiNUMnetwork/CookiNUMnetwork.exe
