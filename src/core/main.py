@@ -19,6 +19,7 @@ def main():
     # Disable location services by setting environment variable
     os.environ["QT_DISABLE_LOCATION"] = "1"
 
+    logger.info(sys.path)
     app = QApplication([])
     app.setApplicationName("CookinNUMnetwork")
 
