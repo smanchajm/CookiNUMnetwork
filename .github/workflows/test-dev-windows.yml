@@ -17,58 +17,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~\AppData\Local\pip\Cache
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      - name: Install VLC
+      - name: Check resource presence
+        run: dir src/resources/icons
         shell: powershell
-        run: |
-          Set-ExecutionPolicy Bypass -Scope Process -Force
-          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-          iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-          choco install vlc -y --no-progress
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install -r requirements-dev.txt
-          pip install -e . --no-deps
-
-      - name: Run app in dev mode (capturing output)
-        shell: powershell
-        run: |
-          $logDir = "logs"
-          New-Item -ItemType Directory -Force -Path $logDir | Out-Null
-
-          Write-Host "=== Lancement de l'app ==="
-          $env:PYTHONPATH = "."
-          python -m src.core.main
-          Start-Sleep -Seconds 20
-          if ($LASTEXITCODE -ne 0) {
-            Write-Error "App crashed with exit code $LASTEXITCODE"
-            exit $LASTEXITCODE
-          }
-
-      - name: Print log preview
-        shell: powershell
-        run: |
-          $logFile = "logs/cookinum.log"
-          Write-Host "===== Log preview ====="
-          if (Test-Path $logFile) {
-            Get-Content $logFile -Tail 30
-          } else {
-            Write-Host "No log file found"
-          }
-
-      - name: Upload app logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: DevApp-logs-Windows
-          path: logs/
