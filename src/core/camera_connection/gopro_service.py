@@ -1,6 +1,6 @@
 import qrcode
 
-from PyQt6.QtCore import QObject
+from PySide6.QtCore import QObject
 
 
 from src.core.event_handler import events

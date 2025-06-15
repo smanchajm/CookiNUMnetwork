@@ -1,6 +1,6 @@
 """Common layout patterns for UI sections."""
 
-from PyQt6.QtWidgets import (
+from PySide6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QFormLayout,
@@ -9,7 +9,7 @@ from PyQt6.QtWidgets import (
     QFrame,
     QLayout,
 )
-from PyQt6.QtCore import Qt
+from PySide6.QtCore import Qt
 
 
 def create_form_layout(

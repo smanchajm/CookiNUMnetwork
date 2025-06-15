@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QFrame
+from PySide6.QtWidgets import QFrame
 
 from src.ui.sections.media_live_section import MediaLiveSection
 from src.ui.sections.media_replay_section import MediaReplaySection

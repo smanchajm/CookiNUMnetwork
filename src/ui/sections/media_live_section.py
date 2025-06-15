@@ -1,8 +1,8 @@
 import time
 
-from PyQt6.QtCore import Qt, QUrl
-from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
-from PyQt6.QtWidgets import QFrame, QLabel
+from PySide6.QtCore import Qt, QUrl
+from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
+from PySide6.QtWidgets import QFrame, QLabel
 
 from src.core.logging_config import logger
 from src.core.video_processing.player import VLCPlayer

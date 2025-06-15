@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QFrame
+from PySide6.QtWidgets import QFrame
 
 from src.ui.sections.media_controls_section import MediaControls
 from src.ui.utils.layouts import create_vbox_layout

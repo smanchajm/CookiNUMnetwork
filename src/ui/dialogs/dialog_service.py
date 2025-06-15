@@ -2,7 +2,7 @@
 Application dialog management service.
 """
 
-from PyQt6.QtWidgets import QMessageBox
+from PySide6.QtWidgets import QMessageBox
 
 from src.ui.dialogs.gopro_connection_dialog import GoProConnectionDialog
 from src.ui.dialogs.wifi_connection_dialog import WiFiConnectionDialog

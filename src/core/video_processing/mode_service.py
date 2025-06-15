@@ -52,7 +52,7 @@ class ModeService:
         for callback in self._transition_callbacks:
             callback(old_mode, new_mode)
 
-        # Emit global signal
+        # Emit global Signal
         events.live_mode_changed.emit(self.is_live_mode)
 
     def get_mode(self) -> Mode:

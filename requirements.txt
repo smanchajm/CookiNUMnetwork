@@ -1,8 +1,9 @@
 # UI
-PyQt6>=6.4.2
-PyQt6-Qt6>=6.4.2
-PyQt6-sip>=13.4.0
-qt_material==2.14
+# PyQt6>=6.4.2
+# PyQt6-Qt6>=6.4.2
+# PyQt6-sip>=13.4.0
+# qt_material==2.14
+PySide6
 
 # Video Processing
 opencv-python>=4.8.0

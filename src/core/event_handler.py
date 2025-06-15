@@ -1,87 +1,87 @@
-from PyQt6.QtCore import pyqtSignal, QObject
+from PySide6.QtCore import Signal, QObject
 
 
 class EventHandler(QObject):
-    """Centralized event handler for the application signals."""
+    """Centralized event handler for the application Signals."""
 
     _instance = None
 
-    # Live mode signals
-    live_mode_changed = pyqtSignal(bool)  # True for live mode, False for review mode
+    # Live mode Signals
+    live_mode_changed = Signal(bool)  # True for live mode, False for review mode
 
-    # Recording signals
-    recording_state_changed = pyqtSignal(bool)  # True for recording, False for stopped
-    recording_started = pyqtSignal(str)  # Path to the recording file
-    recording_stopped = pyqtSignal(str)  # Path to the recording file
-    recording_error = pyqtSignal(str)  # Error message
+    # Recording Signals
+    recording_state_changed = Signal(bool)  # True for recording, False for stopped
+    recording_started = Signal(str)  # Path to the recording file
+    recording_stopped = Signal(str)  # Path to the recording file
+    recording_error = Signal(str)  # Error message
 
-    # Tag management signals
-    tags_updated = pyqtSignal(list)  # List of all tags
-    add_tag_clicked = pyqtSignal()
-    tag_selected = pyqtSignal(str)
-    request_tag_timestamp = pyqtSignal(int)  # Tag number requested by voice command
-    delete_tag = pyqtSignal(str)
+    # Tag management Signals
+    tags_updated = Signal(list)  # List of all tags
+    add_tag_clicked = Signal()
+    tag_selected = Signal(str)
+    request_tag_timestamp = Signal(int)  # Tag number requested by voice command
+    delete_tag = Signal(str)
 
-    # GoPro signals
-    connected = pyqtSignal()
-    disconnected = pyqtSignal()
-    connection_error = pyqtSignal(str)
-    qrcode_created = pyqtSignal(str)
+    # GoPro Signals
+    connected = Signal()
+    disconnected = Signal()
+    connection_error = Signal(str)
+    qrcode_created = Signal(str)
 
-    # Streaming signals
-    streaming_started = pyqtSignal()
-    streaming_stopped = pyqtSignal()
-    streaming_error = pyqtSignal(str)
-    streaming_status = pyqtSignal(str)
+    # Streaming Signals
+    streaming_started = Signal()
+    streaming_stopped = Signal()
+    streaming_error = Signal(str)
+    streaming_status = Signal(str)
 
-    # Media signals
-    media_loaded = pyqtSignal(str)
-    media_loaded_total_time = pyqtSignal(float)
-    media_error = pyqtSignal(str)
-    play_state_changed = pyqtSignal(bool)
-    toggle_play_signal = pyqtSignal()
-    media_ended = pyqtSignal()  # Signal emitted when media playback ends
+    # Media Signals
+    media_loaded = Signal(str)
+    media_loaded_total_time = Signal(float)
+    media_error = Signal(str)
+    play_state_changed = Signal(bool)
+    toggle_play_Signal = Signal()
+    media_ended = Signal()  # Signal emitted when media playback ends
 
-    # Media controls signals
-    rewind_signal = pyqtSignal()
-    forward_signal = pyqtSignal()
-    play_pause_signal = pyqtSignal()
-    seek_signal = pyqtSignal(float)
-    slow_down_signal = pyqtSignal()
-    position_changed = pyqtSignal(float, float)
+    # Media controls Signals
+    rewind_Signal = Signal()
+    forward_Signal = Signal()
+    play_pause_Signal = Signal()
+    seek_Signal = Signal(float)
+    slow_down_Signal = Signal()
+    position_changed = Signal(float, float)
 
-    # Sidebar actions signals
-    open_video_clicked = pyqtSignal()
-    start_recording_clicked = pyqtSignal()
-    connect_gopro_clicked = pyqtSignal()
-    connect_wifi_clicked = pyqtSignal()
-    live_mode_clicked = pyqtSignal()
-    review_mode_clicked = pyqtSignal()
-    load_last_video_clicked = pyqtSignal()
+    # Sidebar actions Signals
+    open_video_clicked = Signal()
+    start_recording_clicked = Signal()
+    connect_gopro_clicked = Signal()
+    connect_wifi_clicked = Signal()
+    live_mode_clicked = Signal()
+    review_mode_clicked = Signal()
+    load_last_video_clicked = Signal()
 
-    # Mode transition signals
-    mode_changed = pyqtSignal(bool)  # bool: is_live_mode
+    # Mode transition Signals
+    mode_changed = Signal(bool)  # bool: is_live_mode
 
-    # Media playback signals
-    media_playback_started = pyqtSignal()
-    media_playback_paused = pyqtSignal()
-    media_playback_stopped = pyqtSignal()
-    media_playback_error = pyqtSignal(str)
+    # Media playback Signals
+    media_playback_started = Signal()
+    media_playback_paused = Signal()
+    media_playback_stopped = Signal()
+    media_playback_error = Signal(str)
 
-    # Progression signals
-    progress_updated = pyqtSignal(float)  # Progress as percentage (0-100)
-    time_updated = pyqtSignal(int, int)  # (current position, total duration) in seconds
+    # Progression Signals
+    progress_updated = Signal(float)  # Progress as percentage (0-100)
+    time_updated = Signal(int, int)  # (current position, total duration) in seconds
 
-    # Speed signals
-    speed_changed = pyqtSignal(float)  # New playback speed
+    # Speed Signals
+    speed_changed = Signal(float)  # New playback speed
 
     # Application events
-    application_closing = pyqtSignal()
+    application_closing = Signal()
 
-    # Zoom signals
-    cycle_zoom_signal = pyqtSignal()
-    zoom_in_signal = pyqtSignal()
-    zoom_out_signal = pyqtSignal()
+    # Zoom Signals
+    cycle_zoom_Signal = Signal()
+    zoom_in_Signal = Signal()
+    zoom_out_Signal = Signal()
 
     def __new__(cls):
         if cls._instance is None:

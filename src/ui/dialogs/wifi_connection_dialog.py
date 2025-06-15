@@ -1,7 +1,7 @@
 from pathlib import Path
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QPixmap
-from PyQt6.QtWidgets import (
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPixmap
+from PySide6.QtWidgets import (
     QDialog,
     QFormLayout,
     QLabel,
@@ -9,8 +9,8 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QPixmap
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPixmap
 
 from src.core.camera_connection.gopro_service import GoProService
 from src.ui.widgets.action_button import ActionButton

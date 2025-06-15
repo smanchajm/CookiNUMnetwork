@@ -1,5 +1,5 @@
-from PyQt6.QtGui import QKeySequence, QShortcut
-from PyQt6.QtWidgets import QWidget
+from PySide6.QtGui import QKeySequence, QShortcut
+from PySide6.QtWidgets import QWidget
 
 from src.core.event_handler import events
 
@@ -7,7 +7,7 @@ from src.core.event_handler import events
 class KeyboardShortcutsService:
     """
     Manages the application's keyboard shortcuts.
-    Uses PyQt6's QShortcut for native shortcut handling.
+    Uses PySide6's QShortcut for native shortcut handling.
     """
 
     def __init__(self, parent: QWidget):
@@ -18,9 +18,9 @@ class KeyboardShortcutsService:
     def _setup_shortcuts(self):
         """Configure all application keyboard shortcuts."""
         # Playback shortcuts
-        self._add_shortcut("Space", events.play_pause_signal.emit)
-        self._add_shortcut("Right", events.forward_signal.emit)
-        self._add_shortcut("Left", events.rewind_signal.emit)
+        self._add_shortcut("Space", events.play_pause_Signal.emit)
+        self._add_shortcut("Right", events.forward_Signal.emit)
+        self._add_shortcut("Left", events.rewind_Signal.emit)
 
         # Mode shortcuts
         self._add_shortcut("D", events.live_mode_clicked.emit)

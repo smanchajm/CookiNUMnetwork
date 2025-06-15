@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from PyQt6.QtCore import QObject, QTimer
-from PyQt6.QtWidgets import QFileDialog
+from PySide6.QtCore import QObject, QTimer
+from PySide6.QtWidgets import QFileDialog
 
 from src.core.event_handler import events
 from src.core.logging_config import logger

@@ -1,8 +1,8 @@
 import time
 
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QIcon, QPainter
-from PyQt6.QtWidgets import QLabel, QSlider, QStyle, QStyleOptionSlider, QWidget
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QIcon, QPainter
+from PySide6.QtWidgets import QLabel, QSlider, QStyle, QStyleOptionSlider, QWidget
 
 from src.core.event_handler import events
 from src.ui.utils.layouts import create_hbox_layout, create_vbox_layout
@@ -120,18 +120,18 @@ class MediaControls(QWidget):
         self.setLayout(main_layout)
 
     def setup_connections(self):
-        self.slow_down_btn.clicked.connect(events.slow_down_signal.emit)
-        self.rewind_btn.clicked.connect(events.rewind_signal.emit)
+        self.slow_down_btn.clicked.connect(events.slow_down_Signal.emit)
+        self.rewind_btn.clicked.connect(events.rewind_Signal.emit)
         self.play_pause_btn.clicked.connect(self.toggle_play)
-        self.forward_btn.clicked.connect(events.forward_signal.emit)
-        self.zoom_btn.clicked.connect(events.cycle_zoom_signal.emit)
+        self.forward_btn.clicked.connect(events.forward_Signal.emit)
+        self.zoom_btn.clicked.connect(events.cycle_zoom_Signal.emit)
         self.progress_slider.valueChanged.connect(self.on_slider_value_changed)
         events.position_changed.connect(self.update_timeline)
         events.play_state_changed.connect(self.on_play_state_changed)
 
     def toggle_play(self):
         """Toggle playback state and update interface."""
-        events.play_pause_signal.emit()
+        events.play_pause_Signal.emit()
 
     def on_play_state_changed(self, is_playing: bool):
         """Update UI based on play state."""
@@ -157,7 +157,7 @@ class MediaControls(QWidget):
         """Called when slider value changes (0-100)."""
         if self.is_programmatic_update:
             return
-        events.seek_signal.emit(value / 100.0)  # Convert to percentage (0-1)
+        events.seek_Signal.emit(value / 100.0)  # Convert to percentage (0-1)
 
     def on_tags_changed(self, tags: list[tuple[str, str, str]]):
         """

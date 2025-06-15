@@ -3,7 +3,7 @@ from datetime import datetime
 from pathlib import Path
 
 import cv2
-from PyQt6.QtCore import QObject
+from PySide6.QtCore import QObject
 
 from src.core.event_handler import events
 from src.core.logging_config import logger
@@ -114,15 +114,15 @@ class RecordingService(QObject):
         self._setup_recording_thread()
 
     def _setup_recording_thread(self):
-        """Setup a new recording thread and connect its signals."""
+        """Setup a new recording thread and connect its Signals."""
         if self._recording_thread is not None:
-            # Disconnect old signals
+            # Disconnect old Signals
             try:
                 events.recording_started.disconnect()
                 events.recording_stopped.disconnect()
                 events.recording_error.disconnect()
             except (TypeError, RuntimeError):
-                pass  # Ignore if signals were already disconnected
+                pass  # Ignore if Signals were already disconnected
 
             # Stop and clean up old thread
             if self._recording_thread.is_alive():
@@ -192,13 +192,13 @@ class RecordingService(QObject):
         """Clean up resources before application exit."""
         if self._recording_thread:
             try:
-                # Disconnect signals first
+                # Disconnect Signals first
                 try:
                     events.recording_started.disconnect()
                     events.recording_stopped.disconnect()
                     events.recording_error.disconnect()
                 except (TypeError, RuntimeError):
-                    pass  # Ignore if signals were already disconnected
+                    pass  # Ignore if Signals were already disconnected
 
                 # Stop recording if active
                 if self._is_recording:

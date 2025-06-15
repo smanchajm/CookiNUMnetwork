@@ -1,4 +1,4 @@
-from PyQt6.QtGui import QFontDatabase
+from PySide6.QtGui import QFontDatabase
 from src.utils.resource_manager import ResourceManager
 from src.core.logging_config import logger
 

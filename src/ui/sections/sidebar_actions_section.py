@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget
+from PySide6.QtWidgets import QWidget
 
 from src.core.event_handler import events
 from src.ui.utils.layouts import create_vbox_layout
@@ -78,12 +78,12 @@ class ActionButtonsSection(QWidget):
 
     def _setup_ui(self):
         """Creates the buttons and layout."""
-        for text, name, icon_path, signal in self.mode_buttons_data:
+        for text, name, icon_path, Signal in self.mode_buttons_data:
             button = ActionButton(
                 text=text, icon_path=icon_path, css_class="mode_button"
             )
             button.setObjectName(name)
-            button.clicked.connect(signal.emit)
+            button.clicked.connect(Signal.emit)
             self.buttons[name] = button
 
             # Initialiser la propriété active
@@ -94,12 +94,12 @@ class ActionButtonsSection(QWidget):
 
         self.buttons["separator_mode_section"] = Separator()
 
-        for text, name, icon_path, signal in self.action_buttons_data:
+        for text, name, icon_path, Signal in self.action_buttons_data:
             button = ActionButton(
                 text=text, icon_path=icon_path, css_class="action_button"
             )
             button.setObjectName(name)
-            button.clicked.connect(signal.emit)
+            button.clicked.connect(Signal.emit)
             self.buttons[name] = button
 
         self.buttons["separator_tag_section"] = Separator()

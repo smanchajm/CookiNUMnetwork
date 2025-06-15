@@ -2,8 +2,8 @@ import ctypes
 import sys
 import os
 
-from PyQt6.QtGui import QFont
-from PyQt6.QtWidgets import QApplication
+from PySide6.QtGui import QFont
+from PySide6.QtWidgets import QApplication
 
 from src.core.logging_config import logger
 from src.core.main_controller import MainController

@@ -5,7 +5,7 @@ import threading
 import numpy as np
 import sounddevice as sd
 from num2words import num2words
-from PyQt6.QtCore import QObject
+from PySide6.QtCore import QObject
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from vosk import Model, KaldiRecognizer
@@ -122,10 +122,10 @@ class VoiceService(QObject):
         """Initialize commands with their variants using canonical phrases."""
         # Command mapping with actions
         command_actions = {
-            "play": lambda: events.play_pause_signal.emit(),
-            "pause": lambda: events.play_pause_signal.emit(),
-            "forward": lambda: events.forward_signal.emit(),
-            "backward": lambda: events.rewind_signal.emit(),
+            "play": lambda: events.play_pause_Signal.emit(),
+            "pause": lambda: events.play_pause_Signal.emit(),
+            "forward": lambda: events.forward_Signal.emit(),
+            "backward": lambda: events.rewind_Signal.emit(),
             "tag": lambda: events.add_tag_clicked.emit(),
             "record": lambda: events.start_recording_clicked.emit(),
             "stop_record": lambda: events.start_recording_clicked.emit(),
@@ -134,9 +134,9 @@ class VoiceService(QObject):
             "open": lambda: events.open_video_clicked.emit(),
             "open_last_video": lambda: events.load_last_video_clicked.emit(),
             "goto_tag": lambda text: self._handle_goto_tag(text),
-            "zoom": lambda: events.cycle_zoom_signal.emit(),
-            "zoom_in": lambda: events.zoom_in_signal.emit(),
-            "zoom_out": lambda: events.zoom_out_signal.emit(),
+            "zoom": lambda: events.cycle_zoom_Signal.emit(),
+            "zoom_in": lambda: events.zoom_in_Signal.emit(),
+            "zoom_out": lambda: events.zoom_out_Signal.emit(),
         }
 
         # Add commands using canonical phrases

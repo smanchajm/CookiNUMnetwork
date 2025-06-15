@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QMainWindow
+from PySide6.QtWidgets import QMainWindow
 
 from src.core.camera_connection.gopro_service import GoProService
 from src.core.event_handler import events
@@ -60,7 +60,7 @@ class MainController:
         logger.info("Voice service started")
 
     def setup_connections(self):
-        """Configure all signal connections between sections."""
+        """Configure all Signal connections between sections."""
         self._setup_application_connections()
         self._setup_sidebar_connections()
         self._setup_media_connections()
@@ -113,14 +113,14 @@ class MainController:
     def _setup_media_connections(self):
         """Configure connections for media control."""
         # Playback control connections
-        events.play_pause_signal.connect(self.media_service.toggle_play_pause)
-        events.rewind_signal.connect(lambda: self.media_service.rewind(10))
-        events.forward_signal.connect(lambda: self.media_service.forward(10))
-        events.seek_signal.connect(self.media_service.seek)
-        events.slow_down_signal.connect(self.media_service.slow_down)
-        events.cycle_zoom_signal.connect(self.media_service.cycle_zoom)
-        events.zoom_in_signal.connect(self.media_service.zoom_in)
-        events.zoom_out_signal.connect(self.media_service.zoom_out)
+        events.play_pause_Signal.connect(self.media_service.toggle_play_pause)
+        events.rewind_Signal.connect(lambda: self.media_service.rewind(10))
+        events.forward_Signal.connect(lambda: self.media_service.forward(10))
+        events.seek_Signal.connect(self.media_service.seek)
+        events.slow_down_Signal.connect(self.media_service.slow_down)
+        events.cycle_zoom_Signal.connect(self.media_service.cycle_zoom)
+        events.zoom_in_Signal.connect(self.media_service.zoom_in)
+        events.zoom_out_Signal.connect(self.media_service.zoom_out)
 
         events.position_changed.connect(
             self.main_window.media_player.on_position_changed

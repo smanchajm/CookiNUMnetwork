@@ -5,7 +5,7 @@ import time
 import threading
 from typing import Optional
 
-from PyQt6.QtCore import QObject, pyqtSignal
+from PySide6.QtCore import QObject, Signal
 
 from src.core.event_handler import events
 from src.core.logging_config import logger
