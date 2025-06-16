@@ -120,15 +120,28 @@ class ResourceManager:
         return ResourceManager.get_user_data_dir() / ressource_name
 
     @staticmethod
-    def get_ipv4_address() -> str:
+    def get_ipv4_address():
         """
-        Obtient l'adresse IPv4 de la machine.
+        Gets the IPv4 address of the machine using multiple methods.
 
         Returns:
-            str: Adresse IPv4
+            Optional[str]: IPv4 address or None if not found
         """
-        hostname = socket.gethostname()
-        return socket.gethostbyname(hostname)
+        try:
+            # Méthode fiable via une connexion externe simulée
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("8.8.8.8", 80))
+            ip = s.getsockname()[0]
+            s.close()
+            return ip
+        except Exception:
+            try:
+                # Fallback via le hostname
+                hostname = socket.gethostname()
+                ip = socket.gethostbyname(hostname)
+                return ip if not ip.startswith("127.") else None
+            except Exception:
+                return None
 
     @staticmethod
     def get_gopro_rtmp_url() -> str:
@@ -162,15 +175,16 @@ class ResourceManager:
     @staticmethod
     def get_resource_path(resource_name: Union[str, Path]) -> Path:
         """
-        Obtient le chemin complet vers une ressource.
+        Gets the full path to a resource.
 
         Args:
-            resource_name: Nom de la ressource (chemin relatif depuis le dossier resources)
-                          Peut être une chaîne ou un Path
+            resource_name: Resource name (relative path from resources directory)
+                          Can be a string or Path
 
         Returns:
-            Path: Chemin complet vers la ressource
+            Path: Full path to the resource
         """
+        print(ResourceManager._get_base_path())
         try:
             if ResourceManager._is_pyinstaller_mode():
                 return (
@@ -308,6 +322,9 @@ class ResourceManager:
             Tuple[Path, Path]: Tuple contenant le chemin vers le binaire et le fichier de configuration
         """
         binary_name = "mediamtx.exe" if sys.platform == "win32" else "mediamtx"
+        print(
+            ResourceManager.get_resource_path(Path("binaries/mediamtx") / binary_name)
+        )
         return (
             ResourceManager.get_resource_path(Path("binaries/mediamtx") / binary_name),
             ResourceManager.get_resource_path(Path("binaries/mediamtx/mediamtx.yml")),
