@@ -1,6 +1,6 @@
 from pathlib import Path
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QPixmap
+from PySide6.QtGui import QPixmap, QIcon
 from PySide6.QtWidgets import (
     QDialog,
     QFormLayout,
@@ -8,9 +8,9 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QVBoxLayout,
     QWidget,
+    QHBoxLayout,
+    QPushButton,
 )
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QPixmap
 
 from src.core.camera_connection.gopro_service import GoProService
 from src.ui.widgets.action_button import ActionButton
@@ -43,11 +43,26 @@ class WiFiConnectionDialog(QDialog):
         form_layout = QFormLayout(form_widget)
 
         self.ssid_input = QLineEdit()
+
+        # Création d'un widget horizontal pour le champ de mot de passe et le bouton
+        password_widget = QWidget()
+        password_layout = QHBoxLayout(password_widget)
+        password_layout.setContentsMargins(0, 0, 0, 0)
+
         self.password_input = QLineEdit()
         self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
 
+        self.toggle_password_button = QPushButton()
+        self.toggle_password_button.setFixedWidth(30)
+        self.toggle_password_button.setCheckable(True)
+        self.toggle_password_button.clicked.connect(self.toggle_password_visibility)
+        self.toggle_password_button.setText("👁")
+
+        password_layout.addWidget(self.password_input)
+        password_layout.addWidget(self.toggle_password_button)
+
         form_layout.addRow("Nom du réseau (SSID):", self.ssid_input)
-        form_layout.addRow("Mot de passe:", self.password_input)
+        form_layout.addRow("Mot de passe:", password_widget)
         layout.addWidget(form_widget)
 
         # Bouton pour générer le QR code
@@ -107,3 +122,11 @@ class WiFiConnectionDialog(QDialog):
 
     def on_close_clicked(self):
         self.reject()
+
+    def toggle_password_visibility(self):
+        if self.password_input.echoMode() == QLineEdit.EchoMode.Password:
+            self.password_input.setEchoMode(QLineEdit.EchoMode.Normal)
+            self.toggle_password_button.setText("🔒")
+        else:
+            self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
+            self.toggle_password_button.setText("👁")
