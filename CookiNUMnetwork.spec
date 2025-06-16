@@ -52,7 +52,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=os.path.join('src', 'resources', 'images', 'Logo-CookiNUM-v.ico'),
+    icon=os.path.join('src', 'resources', 'images', 'cookiNUM.ico'),
 )
 
 coll = COLLECT(

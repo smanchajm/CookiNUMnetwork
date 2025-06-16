@@ -20,9 +20,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("CookiNUMnetwork")
-        self.setWindowIcon(
-            QIcon(str(ResourceManager.get_icon_path("Logo-CookiNUM-v.svg")))
-        )
+        self.setWindowIcon(QIcon(str(ResourceManager.get_icon_path("cookiNUM.ico"))))
 
         self.setup_ui()
 
