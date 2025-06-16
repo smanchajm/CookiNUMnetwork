@@ -27,7 +27,23 @@ jobs:
 
       - name: Install VLC
         run: |
-          brew install vlc
+          # Download VLC directly from the official source
+          curl -L -o vlc.dmg https://get.videolan.org/vlc/3.0.21/macosx/vlc-3.0.21-arm64.dmg
+          # Mount the DMG
+          hdiutil attach vlc.dmg
+          # Copy VLC to Applications
+          cp -R "/Volumes/VLC media player/VLC.app" /Applications/
+          # Unmount the DMG
+          hdiutil detach "/Volumes/VLC media player"
+          # Clean up
+          rm vlc.dmg
+          # Verify installation
+          if [ -d "/Applications/VLC.app" ]; then
+            echo "✅ VLC installed successfully"
+          else
+            echo "❌ VLC installation failed"
+            exit 1
+          fi
 
       - name: Install dependencies
         run: |
