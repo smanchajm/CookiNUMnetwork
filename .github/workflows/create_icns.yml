@@ -1,0 +1,39 @@
+name: Build ICNS
+
+on:
+  push:
+    paths:
+      - 'src/resources/images/Logo-CookiNUM-filled-1024.png'
+    branches: [macos_installer]
+  workflow_dispatch:
+
+jobs:
+  build-icns:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Create iconset folder
+      run: |
+        mkdir icon.iconset
+        for size in 16 32 64 128 256 512 1024; do
+          s1=$size
+          s2=$(($size * 2))
+          sfx1="${s1}x${s1}"
+          sfx2="${s1}x${s1}@2x"
+          sfile1="icon.iconset/icon_${sfx1}.png"
+          sfile2="icon.iconset/icon_${sfx2}.png"
+          sips -z $s1 $s1 assets/icon.png --out $sfile1
+          sips -z $s2 $s2 assets/icon.png --out $sfile2
+        done
+
+    - name: Convert iconset to icns
+      run: iconutil -c icns icon.iconset -o assets/app.icns
+
+    - name: Upload ICNS as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: app.icns
+        path: assets/app.icns

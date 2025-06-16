@@ -2,7 +2,7 @@ name: Test macos app in dev mode with logs
 
 on:
   push:
-    branches: [macos_installer]
+    branches: [xxx]
 
 jobs:
   test-dev:
