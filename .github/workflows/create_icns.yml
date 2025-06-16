@@ -2,9 +2,9 @@ name: Build ICNS
 
 on:
   push:
+    branches: [macos_installer]
     paths:
       - 'src/resources/images/Logo-CookiNUM-filled-1024.png'
-    branches: [macos_installer]
   workflow_dispatch:
 
 jobs:
