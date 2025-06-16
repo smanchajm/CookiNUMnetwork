@@ -17,7 +17,7 @@ jobs:
 
     - name: Create iconset folder
       run: |
-        mkdir icon.iconset
+        mkdir -p icon.iconset
         for size in 16 32 64 128 256 512 1024; do
           s1=$size
           s2=$(($size * 2))
@@ -25,15 +25,29 @@ jobs:
           sfx2="${s1}x${s1}@2x"
           sfile1="icon.iconset/icon_${sfx1}.png"
           sfile2="icon.iconset/icon_${sfx2}.png"
-          sips -z $s1 $s1 assets/icon.png --out $sfile1
-          sips -z $s2 $s2 assets/icon.png --out $sfile2
+          sips -z $s1 $s1 src/resources/images/Logo-CookiNUM-filled-1024.png --out $sfile1
+          sips -z $s2 $s2 src/resources/images/Logo-CookiNUM-filled-1024.png --out $sfile2
         done
 
+    - name: Verify iconset structure
+      run: |
+        ls -la icon.iconset/
+        if [ ! -d "icon.iconset" ]; then
+          echo "Error: icon.iconset directory not created"
+          exit 1
+        fi
+
     - name: Convert iconset to icns
-      run: iconutil -c icns icon.iconset -o assets/app.icns
+      run: |
+        mkdir -p src/resources/images
+        iconutil -c icns icon.iconset -o src/resources/images/app.icns
+        if [ ! -f "src/resources/images/app.icns" ]; then
+          echo "Error: ICNS file not generated"
+          exit 1
+        fi
 
     - name: Upload ICNS as artifact
       uses: actions/upload-artifact@v4
       with:
         name: app.icns
-        path: assets/app.icns
+        path: src/resources/images/app.icns
