@@ -1,10 +1,9 @@
 # -*- mode: python ; coding: utf-8 -*-
 from PyInstaller.utils.hooks import collect_data_files
-import glob
 import os
 from pathlib import Path
 
-# Collecte les fichiers de données du package vosk (exemple)
+# Collecte les fichiers de données du package vosk
 vosk_datas = collect_data_files('vosk')
 
 # Inclure tous les fichiers sous src/resources en conservant l'arborescence src/resources
@@ -14,23 +13,19 @@ resources_datas = [
     if f.is_file()
 ]
 
-
-# Exemple modèle vosk (optionnel, si nécessaire)
-model_datas = [
-    (f, os.path.join('src', os.path.relpath(f, 'src')))
-    for f in glob.glob('src/resources/binaries/audio_model/vosk-model-small-fr-0.22/**/*', recursive=True)
-    if os.path.isfile(f)
-]
+# Ajouter le répertoire src au PYTHONPATH
+src_path = os.path.abspath('src')
+os.environ['PYTHONPATH'] = src_path + os.pathsep + os.environ.get('PYTHONPATH', '')
 
 a = Analysis(
     ['src\\core\\main.py'],  # chemin vers ton script principal
-    pathex=[],
+    pathex=[src_path],
     binaries=[],
     datas=[
         *vosk_datas,
         *resources_datas,
     ],
-    hiddenimports=[],
+    hiddenimports=['src.core'],  # Ajouter explicitement le module src.core
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
