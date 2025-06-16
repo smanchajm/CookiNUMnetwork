@@ -6,7 +6,7 @@ on:
 
 jobs:
   test-dev:
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     steps:
       - name: Checkout repository
@@ -25,6 +25,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
+      - name: Install VLC
+        shell: powershell
+        run: |
+          Set-ExecutionPolicy Bypass -Scope Process -Force
+          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+          iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+          choco install vlc -y --no-progress
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -32,32 +40,37 @@ jobs:
           pip install -r requirements-dev.txt
           pip install -e .
 
-      - name: Run app in dev mode (non blocking)
-        shell: cmd
+      - name: Run app in dev mode (capturing output)
+        shell: powershell
         run: |
-          mkdir logs
-          echo === Lancement de l'app ===
-          start /B python -m src.core.main
-          timeout /T 15
-          tasklist | findstr python >nul
-          if errorlevel 1 (
-            echo App terminated before 15 seconds ❌
+          $logDir = "logs"
+          New-Item -ItemType Directory -Force -Path $logDir | Out-Null
+      
+          Write-Host "=== Lancement de l'app ==="
+          $process = Start-Process -FilePath "python" -ArgumentList "-m src.core.main" -NoNewWindow -PassThru
+      
+          # Attendre 15 secondes
+          Start-Sleep -Seconds 15
+      
+          # Vérifier que le processus tourne toujours
+          if (Get-Process -Id $process.Id -ErrorAction SilentlyContinue) {
+            Write-Host "App is running correctly after 15 seconds ✅"
+            Stop-Process -Id $process.Id -Force
+          } else {
+            Write-Error "App terminated before 15 seconds ❌"
             exit 1
-          ) else (
-            echo App is running correctly after 15 seconds ✅
-            taskkill /IM python.exe /F
-          )
+          }
 
       - name: Print log preview
+        shell: powershell
         run: |
-          $logPath = "logs/cookinum.log"
-          if (Test-Path $logPath) {
-            Write-Host "===== Log preview ====="
-            Get-Content $logPath -Tail 30
+          $logFile = "logs/cookinum.log"
+          Write-Host "===== Log preview ====="
+          if (Test-Path $logFile) {
+            Get-Content $logFile -Tail 30
           } else {
             Write-Host "No log file found"
           }
-        shell: pwsh
 
       - name: Upload app logs
         if: always()
@@ -70,23 +83,24 @@ jobs:
         run: pyinstaller CookiNUMnetwork.spec
 
       - name: Test built executable
-        shell: cmd
+        shell: powershell
         run: |
-          echo === Testing built EXE ===
-          if not exist dist\CookiNUMnetwork\CookiNUMnetwork.exe (
-            echo ❌ EXE not found in dist\
+          Write-Host "=== Testing built EXE ==="
+          if (-not (Test-Path "dist\CookiNUMnetwork\CookiNUMnetwork.exe")) {
+            Write-Error "❌ EXE not found in dist\"
             exit 1
-          )
-          start /B dist\CookiNUMnetwork\CookiNUMnetwork.exe
-          timeout /T 15
-          tasklist | findstr CookiNUMnetwork.exe >nul
-          if errorlevel 1 (
-            echo ❌ App terminated before 15 seconds
+          }
+          
+          $process = Start-Process -FilePath "dist\CookiNUMnetwork\CookiNUMnetwork.exe" -NoNewWindow -PassThru
+          Start-Sleep -Seconds 15
+          
+          if (Get-Process -Id $process.Id -ErrorAction SilentlyContinue) {
+            Write-Host "✅ EXE is running correctly after 15 seconds"
+            Stop-Process -Id $process.Id -Force
+          } else {
+            Write-Error "❌ App terminated before 15 seconds"
             exit 1
-          ) else (
-            echo ✅ EXE is running correctly after 15 seconds
-            taskkill /IM CookiNUMnetwork.exe /F
-          )
+          }
 
       - name: Upload built EXE
         uses: actions/upload-artifact@v4
