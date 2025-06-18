@@ -131,6 +131,7 @@ class VLCPlayer(Player):
     def __init__(self):
         self.vlc_instance = vlc.Instance()
         self.media_player = self.vlc_instance.media_player_new()
+        self.media_player.audio_set_volume(0)
         self.playback_speed = 1.0
         self.speed_levels = [0.25, 0.5, 0.75, 1.0]
         self.zoom_level = 0

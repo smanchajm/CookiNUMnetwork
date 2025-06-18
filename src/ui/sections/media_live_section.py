@@ -29,7 +29,6 @@ class MediaLiveSection(QFrame):
             "--network-caching=50",  # 50 ms de buffer réseau
             "--no-drop-late-frames",
             "--no-skip-frames",
-            "--no-audio",
         ]
 
         # audio player
