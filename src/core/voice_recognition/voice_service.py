@@ -200,6 +200,7 @@ class VoiceService(QObject):
 
         # Execute action if command found
         if best_command:
+            events.voice_command_recognized.emit()
             if best_command == "goto_tag":
                 self._handle_goto_tag(text)
             else:

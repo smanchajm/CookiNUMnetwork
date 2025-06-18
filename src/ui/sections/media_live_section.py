@@ -98,7 +98,7 @@ class MediaLiveSection(QFrame):
         """Update display based on connection state."""
         self.instructions_label.setVisible(not self.is_rtmp_connected)
 
-    def on_recording_state_changed(self, is_recording: bool):
+    def on_recording_state_changed(self, is_recording: bool = False):
         """Show or hide the recording indicator overlay and play sound."""
         self.recording_indicator.setVisible(is_recording)
         self.recording_indicator.raise_()

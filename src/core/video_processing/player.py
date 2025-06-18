@@ -133,7 +133,7 @@ class VLCPlayer(Player):
         self.media_player = self.vlc_instance.media_player_new()
         self.playback_speed = 1.0
         self.speed_levels = [0.25, 0.5, 0.75, 1.0]
-        self.zoom_level = 1.0
+        self.zoom_level = 0
         self.zoom_levels = [0, 2.0, 4.0]
 
     def load(self, media_path):
@@ -234,6 +234,7 @@ class VLCPlayer(Player):
             if current_index < len(self.zoom_levels) - 1:
                 self.set_zoom(self.zoom_levels[current_index + 1])
         except ValueError:
+            logger.error(f"Current zoom level not found in list: {self.zoom_level}")
             # If current zoom level not found in list, set to first zoom level
             self.set_zoom(self.zoom_levels[0])
 

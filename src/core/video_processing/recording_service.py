@@ -34,7 +34,6 @@ class RecordingThread(threading.Thread):
             # Generate output filename with timestamp
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             self._output_file = video_path / f"recording_{timestamp}.mp4"
-
             # Open RTMP stream
             logger.info(f"Opening RTMP stream: {ResourceManager.get_gopro_rtmp_url()}")
             self._cap = cv2.VideoCapture(ResourceManager.get_gopro_rtmp_url())

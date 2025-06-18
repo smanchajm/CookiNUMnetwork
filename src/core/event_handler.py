@@ -6,6 +6,9 @@ class EventHandler(QObject):
 
     _instance = None
 
+    # voice recognition Signals
+    voice_command_recognized = Signal()
+
     # Live mode Signals
     live_mode_changed = Signal(bool)  # True for live mode, False for review mode
 
