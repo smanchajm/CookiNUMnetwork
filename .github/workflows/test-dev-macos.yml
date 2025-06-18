@@ -1,8 +1,10 @@
 name: Test macos app in dev mode with logs
 
 on:
+  release:
+    types: [created]
   push:
-    branches: [xxx]
+    branches: [macos_installer]
 
 jobs:
   test-dev:
@@ -57,11 +59,6 @@ jobs:
           pip uninstall -y pyinstaller
           PYINSTALLER_COMPILE_BOOTLOADER=1 pip install git+https://github.com/pyinstaller/pyinstaller.git@develop
 
-      - name: Install PyInstaller from develop branch with custom bootloader
-        run: |
-          pip uninstall -y pyinstaller
-          PYINSTALLER_COMPILE_BOOTLOADER=1 pip install git+https://github.com/pyinstaller/pyinstaller.git@develop
-
       - name: Build installer
         run: |
           pyinstaller CookiNUMnetwork.spec
@@ -90,9 +87,44 @@ jobs:
             echo "❌ App not found at $APP_PATH"
             exit 1
           fi
+          
+          # Lancer l'app en arrière-plan
+          "$APP_PATH" &
+          APP_PID=$!
+          
+          # Attendre que l'app démarre
+          sleep 15
+          
+          # Vérifier si l'app est toujours en cours d'exécution
+          if ps -p $APP_PID > /dev/null; then
+            echo "✅ Built app is running correctly after 15 seconds"
+            kill $APP_PID
+          else
+            echo "❌ Built app terminated before 15 seconds"
+            # Récupérer les logs de l'app
+            LOG_PATH="$HOME/Library/Logs/CookiNUMnetwork/cookinum.log"
+            if [ -f "$LOG_PATH" ]; then
+              echo "===== App logs ====="
+              tail -n 50 "$LOG_PATH"
+            else
+              echo "No log file found at $LOG_PATH"
+            fi
+            exit 1
+          fi
 
-      - name: Upload spec file
+      - name: Upload installer
         uses: actions/upload-artifact@v4
         with:
           name: CookiNUMnetwork-macOS
           path: dist
+
+      - name: Upload to Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/CookiNUMnetwork.app
+          tag_name: ${{ github.event.release.tag_name }}
+          name: ${{ github.event.release.name }}
+          body: ${{ github.event.release.body }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
