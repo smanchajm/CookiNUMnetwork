@@ -4,6 +4,8 @@ import os
 import locale
 from pathlib import Path
 
+import qrcode
+
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import QApplication
 
@@ -47,6 +49,10 @@ def main():
     window.showMaximized()
     window.activateWindow()
     logger.info("Application started successfully")
+
+    # test qrcode
+    qrcode.make("test")
+    logger.info("QR code generated")
 
     sys.exit(app.exec())
 

@@ -25,7 +25,10 @@ a = Analysis(
         *vosk_datas,
         *resources_datas,
     ],
-    hiddenimports=['src.core'],  # Ajouter explicitement le module src.core
+    hiddenimports=[
+        'src.core',
+        'PIL', 'PIL.Image', 'PIL._imaging', 'PIL.ImageDraw'
+    ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
