@@ -1,6 +1,9 @@
 import json
 import queue
 import threading
+import sys
+import locale
+import os
 
 import numpy as np
 import sounddevice as sd
@@ -104,6 +107,12 @@ class VoiceService(QObject):
         self.model = None
         self.recognizer = None
         self.command_matcher = CommandMatcher()
+
+        # Log de la configuration d'encodage
+        logger.info(f"Python default encoding: {sys.getdefaultencoding()}")
+        logger.info(f"System locale: {locale.getlocale()}")
+        logger.info(f"PYTHONIOENCODING: {os.environ.get('PYTHONIOENCODING')}")
+
         self._initialize_models()
         self._initialize_commands()
 
@@ -307,6 +316,13 @@ class VoiceService(QObject):
             if self.recognizer.AcceptWaveform(data):
                 result = json.loads(self.recognizer.Result())
                 if result.get("text"):
-                    text = result["text"].lower()
+                    # Forcer l'encodage UTF-8 pour le texte reconnu
+                    raw_text = (
+                        result["text"].encode("utf-8", errors="replace").decode("utf-8")
+                    )
+                    logger.debug(
+                        f"Raw Vosk output (encoded): {raw_text.encode('utf-8')}"
+                    )
+                    text = raw_text.lower()
                     logger.info(f"Recognized text: {text}")
                     self._handle_command(text)

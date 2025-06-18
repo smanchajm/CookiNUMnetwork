@@ -20,7 +20,6 @@ def setup_logging():
     """
     # Create logs directory if it doesn't exist
     # LOG_DIR.mkdir(exist_ok=True)
-    print(LOG_DIR)
     logging.basicConfig(
         level=LOG_LEVEL,
         format=LOG_FORMAT,

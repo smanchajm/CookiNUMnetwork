@@ -1,6 +1,7 @@
 import ctypes
 import sys
 import os
+import locale
 
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import QApplication
@@ -13,10 +14,28 @@ from src.utils.fonts import add_fonts
 from src.utils.resource_manager import ResourceManager
 
 
-def main():
-    # Disable location services by setting environment variable
-    os.environ["QT_DISABLE_LOCATION"] = "1"
+# Forcer l'encodage UTF-8
+def configure_encoding():
+    if sys.stdout.encoding != "utf-8":
+        sys.stdout.reconfigure(encoding="utf-8")
+    if sys.stderr.encoding != "utf-8":
+        sys.stderr.reconfigure(encoding="utf-8")
 
+    # Forcer la locale
+    try:
+        locale.setlocale(locale.LC_ALL, "fr_FR.UTF-8")
+    except locale.Error:
+        try:
+            locale.setlocale(locale.LC_ALL, "French_France.UTF-8")
+        except locale.Error:
+            logger.warning("Warning: Impossible de définir la locale française")
+
+    # Forcer l'encodage des variables d'environnement
+    os.environ["PYTHONIOENCODING"] = "utf-8"
+
+
+def main():
+    configure_encoding()
     app = QApplication([])
     app.setApplicationName("CookinNUMnetwork")
 
@@ -42,7 +61,7 @@ def main():
     MainController(window)
 
     window.showMaximized()
-    app.setActiveWindow(window)
+    window.activateWindow()
     logger.info("Application started successfully")
 
     sys.exit(app.exec())

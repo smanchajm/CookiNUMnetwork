@@ -184,7 +184,6 @@ class ResourceManager:
         Returns:
             Path: Full path to the resource
         """
-        print(ResourceManager._get_base_path())
         try:
             if ResourceManager._is_pyinstaller_mode():
                 return (
@@ -322,9 +321,6 @@ class ResourceManager:
             Tuple[Path, Path]: Tuple contenant le chemin vers le binaire et le fichier de configuration
         """
         binary_name = "mediamtx.exe" if sys.platform == "win32" else "mediamtx"
-        print(
-            ResourceManager.get_resource_path(Path("binaries/mediamtx") / binary_name)
-        )
         return (
             ResourceManager.get_resource_path(Path("binaries/mediamtx") / binary_name),
             ResourceManager.get_resource_path(Path("binaries/mediamtx/mediamtx.yml")),
