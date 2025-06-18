@@ -16,7 +16,7 @@ resources_datas = [
 
 a = Analysis(
     ['src/core/main.py'],
-    pathex=[],
+    pathex=['src'],
     binaries=[],
     datas=[
         *vosk_datas,
