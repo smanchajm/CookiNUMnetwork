@@ -2,6 +2,7 @@ import ctypes
 import sys
 import os
 import locale
+from pathlib import Path
 
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import QApplication
@@ -11,6 +12,7 @@ from src.core.main_controller import MainController
 from src.ui.styles.style_manager import StyleManager
 from src.ui.views.main_window import MainWindow
 from src.utils.fonts import add_fonts
+from src.utils.permissions_checker import ensure_executable
 from src.utils.resource_manager import ResourceManager
 
 
@@ -28,6 +30,10 @@ def main():
         # This line is essential for the icon to appear in the taskbar
         appID = "UPEC.CookinNUMnetwork.0.1"
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(appID)
+    elif sys.platform == "darwin":
+        # Check and set permissions for macOS
+        logger.info("Checking and setting permissions for macOS")
+        ensure_executable(Path("src/resources/binaries/mediamtx/mediamtx"))
 
     # Load styles via StyleManager
     styles = StyleManager.load_styles()
