@@ -240,13 +240,7 @@ class VLCPlayer(Player):
             self.set_zoom(self.zoom_levels[0])
 
     def zoom_out(self):
-        try:
-            current_index = self.zoom_levels.index(self.zoom_level)
-            if current_index > 0:
-                self.set_zoom(self.zoom_levels[current_index - 1])
-        except ValueError:
-            # If current zoom level not found in list, set to first zoom level
-            self.set_zoom(self.zoom_levels[0])
+        self.set_zoom(self.zoom_levels[0])
 
 
 class OpenCVPlayer(Player):
