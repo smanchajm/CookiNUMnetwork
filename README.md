@@ -2,30 +2,6 @@
 
 Application de formation culinaire à distance utilisant des caméras GoPro pour l'enregistrement et la revue de vidéos.
 
-⚠️ Disclaimer : L'application est en cours de développement. Il n'est pas encore possible de cloner le projet pour le tester.
-
-## 🚀 Installation
-
-1. Créer un environnement virtuel Python :
-```bash
-python -m venv venv
-```
-
-2. Activer l'environnement virtuel :
-- Windows :
-```bash
-.\venv\Scripts\activate
-```
-- Linux/MacOS :
-```bash
-source venv/bin/activate
-```
-
-3. Installer les dépendances :
-```bash
-pip install -r requirements.txt
-```
-
 ## 🛠️ Développement
 
 ## 📝 Fonctionnalités principales
