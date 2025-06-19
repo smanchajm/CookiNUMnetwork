@@ -3,6 +3,7 @@ import subprocess
 import socket
 import time
 import threading
+import platform
 from typing import Optional
 
 from PySide6.QtCore import QObject
