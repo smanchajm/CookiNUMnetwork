@@ -108,10 +108,9 @@ class VoiceService(QObject):
         self.recognizer = None
         self.command_matcher = CommandMatcher()
 
-        # Log de la configuration d'encodage
+        # Lo de la configuration d'encodage
         logger.info(f"Python default encoding: {sys.getdefaultencoding()}")
         logger.info(f"System locale: {locale.getlocale()}")
-        logger.info(f"PYTHONIOENCODING: {os.environ.get('PYTHONIOENCODING')}")
 
         self._initialize_models()
         self._initialize_commands()
@@ -215,7 +214,6 @@ class VoiceService(QObject):
 
     def start(self):
         """Start the voice recognition service."""
-        logger.info("test start reco")
         if self.is_running or not self.model:
             if not self.model:
                 logger.error("Cannot start voice recognition: Model not loaded")

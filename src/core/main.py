@@ -35,7 +35,6 @@ def main():
 
     # Create the main window and the controller
     ResourceManager.create_app_data_paths()
-    logger.info(ResourceManager.get_ipv4_address())
     window = MainWindow()
     MainController(window)
 

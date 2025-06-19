@@ -173,6 +173,17 @@ class ResourceManager:
         return f'!MRTMP="rtmp://{ip_address}:{ResourceManager.STREAMING_RTMP_PORT}/{ResourceManager.STREAMING_PATH}"=oW1mVr1080!W!GL'
 
     @staticmethod
+    def get_streaming_url() -> str:
+        """
+        Obtient l'URL de streaming pour GoPro.
+
+        Returns:
+            str: URL de streaming GoPro
+        """
+        ip_address = ResourceManager.get_ipv4_address()
+        return f"rtmp://{ip_address}:{ResourceManager.STREAMING_RTMP_PORT}/{ResourceManager.STREAMING_PATH}"
+
+    @staticmethod
     def get_resource_path(resource_name: Union[str, Path]) -> Path:
         """
         Gets the full path to a resource.

@@ -40,14 +40,19 @@ class GoProConnectionDialog(QDialog):
         self.qrcode_label.setMinimumSize(150, 150)
         layout.addWidget(self.qrcode_label)
 
+        # Label pour afficher l'URL de streaming
+        self.url_label = QLabel()
+        self.url_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.url_label.setWordWrap(True)
+        layout.addWidget(self.url_label)
+
         self.cancel_button = ActionButton("Fermer", css_class="secondary_button")
         self.cancel_button.clicked.connect(self.on_cancel_clicked)
         layout.addWidget(self.cancel_button)
 
     def generate_qrcode(self):
-        # Pour l'instant, on utilise un placeholder
-        placeholder_content = "https://gopro.com/connect"
         self.gopro_service.qrcode_gopro(ResourceManager.get_gopro_streaming_url())
+        self.url_label.setText(f"URL: {ResourceManager.get_streaming_url()}")
 
         # Afficher le QR code généré
         qrcode_file = ResourceManager.get_app_data_paths("qrcode") / "gopro_qrcode.png"

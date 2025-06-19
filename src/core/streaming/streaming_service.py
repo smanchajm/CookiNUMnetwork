@@ -134,7 +134,6 @@ class StreamingService(QObject):
                 return True
 
             logger.info("Launching MediaMTX")
-            logger.info(ResourceManager.get_mediamtx_args())
             self.mediamtx_process = subprocess.Popen(
                 ResourceManager.get_mediamtx_args(),
                 creationflags=subprocess.CREATE_NO_WINDOW,
