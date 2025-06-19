@@ -5,7 +5,7 @@ import time
 import threading
 from typing import Optional
 
-from PySide6.QtCore import QObject, Signal
+from PySide6.QtCore import QObject
 
 from src.core.event_handler import events
 from src.core.logging_config import logger
@@ -123,7 +123,7 @@ class StreamingService(QObject):
         """Start the MediaMTX server."""
         try:
             if self.mediamtx_process is not None:
-                logger.info("MediaMTX process already running")
+                logger.info("MediaMTX process already running, skipping start")
                 return True
 
             logger.info("Starting MediaMTX server")
@@ -173,6 +173,7 @@ class StreamingService(QObject):
                 self.stream_waiter = None
 
             if self.mediamtx_process is not None:
+                logger.info("Terminating MediaMTX process")
                 self.mediamtx_process.terminate()
                 self.mediamtx_process.wait()
                 self.mediamtx_process = None

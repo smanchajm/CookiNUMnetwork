@@ -4,7 +4,6 @@ from src.core.camera_connection.gopro_service import GoProService
 from src.core.event_handler import events
 from src.core.keyboard_shortcuts_service import KeyboardShortcutsService
 from src.core.logging_config import logger
-from src.core.streaming.streaming_service import StreamingService
 from src.core.video_processing.media_service import MediaService
 from src.core.video_processing.mode_service import ModeService, Mode
 from src.core.video_processing.player import VLCPlayer
@@ -31,7 +30,6 @@ class MainController:
         self.mode_manager = ModeService()
 
         # Initialize services
-        self.streaming_service = StreamingService()
         self.recording_service = RecordingService()
         self.media_service = MediaService(self.replay_player, parent=main_window)
         self.gopro_service = GoProService(parent=main_window)
@@ -240,11 +238,13 @@ class MainController:
 
         if hasattr(self, "recording_service"):
             self.recording_service.cleanup()
-        if hasattr(self, "streaming_service"):
-            self.streaming_service.stop_mediamtx()
+        # if hasattr(self, "streaming_service"):
+        #     self.streaming_service.stop_mediamtx()
         if hasattr(self, "media_service"):
             self.media_service.cleanup()
         if hasattr(self, "voice_service"):
             self.voice_service.stop()
+        if hasattr(self, "gopro_service"):
+            self.gopro_service.stop_streaming()
 
         logger.info("Cleanup completed")
