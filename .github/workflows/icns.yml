@@ -15,7 +15,7 @@ jobs:
         run: npm install -g png2icns
 
       - name: Convert PNG to ICNS
-        run: png2icns Logo-CookiNUM_1024.png
+        run: png2icns Logo-CookiNUM_1024.png -o Logo-CookiNUM.icns
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
