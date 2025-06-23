@@ -1,0 +1,24 @@
+name: Build ICNS icon
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-icon:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install png2icns globally
+        run: npm install -g png2icns
+
+      - name: Convert PNG to ICNS
+        run: png2icns Logo-CookiNUM_1024.png
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: icns-icon
+          path: Logo-CookiNUM.icns
