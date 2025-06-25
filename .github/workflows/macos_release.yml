@@ -1,0 +1,133 @@
+name: Build and release macOS app
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-release:
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install VLC
+        run: |
+          # Download VLC directly from the official source
+          curl -L -o vlc.dmg https://get.videolan.org/vlc/3.0.21/macosx/vlc-3.0.21-arm64.dmg
+          # Mount the DMG
+          hdiutil attach vlc.dmg
+          # Copy VLC to Applications
+          cp -R "/Volumes/VLC media player/VLC.app" /Applications/
+          # Unmount the DMG
+          hdiutil detach "/Volumes/VLC media player"
+          # Clean up
+          rm vlc.dmg
+          # Verify installation
+          if [ -d "/Applications/VLC.app" ]; then
+            echo "✅ VLC installed successfully"
+          else
+            echo "❌ VLC installation failed"
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+          pip install -e .
+
+      - name: Install PyInstaller from develop branch with custom bootloader
+        run: |
+          pip uninstall -y pyinstaller
+          PYINSTALLER_COMPILE_BOOTLOADER=1 pip install git+https://github.com/pyinstaller/pyinstaller.git@develop
+
+      - name: Build installer
+        run: |
+          pyinstaller CookiNUMnetwork.spec
+          # Vérifier que l'app a été créée
+          if [ -f "dist/CookiNUMnetwork.app/Contents/MacOS/CookiNUMnetwork" ]; then
+            echo "✅ App bundle built successfully"
+            # Vérifier les ressources
+            if [ -d "dist/CookiNUMnetwork.app/Contents/Resources" ]; then
+              echo "✅ Resources directory present"
+            else
+              echo "❌ Resources directory missing"
+              exit 1
+            fi
+          else
+            echo "❌ App bundle build failed"
+            exit 1
+          fi
+
+      - name: Test built installer
+        run: |
+          echo "=== Testing built installer ==="
+          APP_PATH="dist/CookiNUMnetwork.app/Contents/MacOS/CookiNUMnetwork"
+          
+          # Vérifier que l'app existe
+          if [ ! -f "$APP_PATH" ]; then
+            echo "❌ App not found at $APP_PATH"
+            exit 1
+          fi
+          
+          # Lancer l'app en arrière-plan
+          "$APP_PATH" &
+          APP_PID=$!
+          
+          # Attendre que l'app démarre
+          sleep 15
+          
+          # Vérifier si l'app est toujours en cours d'exécution
+          if ps -p $APP_PID > /dev/null; then
+            echo "✅ Built app is running correctly after 15 seconds"
+            kill $APP_PID
+          else
+            echo "❌ Built app terminated before 15 seconds"
+            # Récupérer les logs de l'app
+            LOG_PATH="$HOME/Library/Logs/CookiNUMnetwork/cookinum.log"
+            if [ -f "$LOG_PATH" ]; then
+              echo "===== App logs ====="
+              tail -n 50 "$LOG_PATH"
+            else
+              echo "No log file found at $LOG_PATH"
+            fi
+            exit 1
+          fi
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: CookiNUMnetwork-macOS
+          path: dist
+
+      - name: Create Release
+        id: create_release
+        uses: comnoco/create-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            ## CookiNUMnetwork windows macOS Release 
+          draft: false
+          prerelease: false
+          files: |
+            dist
