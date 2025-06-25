@@ -54,13 +54,14 @@ class GoProConnectionDialog(QDialog):
         self.gopro_service.qrcode_gopro(ResourceManager.get_gopro_streaming_url())
         self.url_label.setText(f"URL: {ResourceManager.get_streaming_url()}")
 
-        # Afficher le QR code généré
         qrcode_file = ResourceManager.get_app_data_paths("qrcode") / "gopro_qrcode.png"
         if qrcode_file.exists():
             pixmap = QPixmap(str(qrcode_file))
+            # Option : ne pas redimensionner ou bien choisir une taille fixe
             self.qrcode_label.setPixmap(
                 pixmap.scaled(
-                    self.qrcode_label.size(),
+                    350,
+                    350,
                     Qt.AspectRatioMode.KeepAspectRatio,
                     Qt.TransformationMode.SmoothTransformation,
                 )
