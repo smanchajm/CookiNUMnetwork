@@ -117,17 +117,13 @@ jobs:
           name: CookiNUMnetwork-macOS
           path: dist
 
-      - name: Create Release
-        id: create_release
-        uses: comnoco/create-release@v2
+      - name: Create release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: |
-            ## CookiNUMnetwork windows macOS Release 
-          draft: false
-          prerelease: false
-          files: |
-            dist
+          tag: ${{ github.ref_name }}
+        run: |
+          gh release create "$tag" \
+              --repo="$GITHUB_REPOSITORY" \
+              --title="${tag#v}" \
+              --generate-notes \
+              --attach "dist"
