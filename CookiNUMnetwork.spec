@@ -67,6 +67,6 @@ coll = COLLECT(
 app = BUNDLE(
     coll,
     name='CookiNUMnetwork.app',
-    icon=None,
+    icon='src/resources/images/Logo-CookiNUM.icns',
     bundle_identifier=None,
 )
