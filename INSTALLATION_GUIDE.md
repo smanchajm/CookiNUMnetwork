@@ -138,6 +138,9 @@ Si vous n'avez pas les droits administrateur, demandez à votre administrateur s
    - Testez le streaming
    - Si ça fonctionne, ajoutez CookiNUMnetwork aux exceptions de votre antivirus
 
+**Symptôme** : Perte de connection au live
+- Ceci peut être dû à une connection instable, merci de vérifier votre wifi et de tester avec un autre réseau comme un partage de connection.
+
 **Symptôme** : Problèmes non identifiés
 - Consultez les logs de l'application
 - Pour localiser les logs : ouvrez une vidéo dans l'application, puis remontez d'un niveau dans le dossier pour trouver le fichier de logs
