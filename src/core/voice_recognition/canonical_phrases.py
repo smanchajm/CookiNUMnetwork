@@ -443,6 +443,13 @@ CANONICAL_PHRASES = {
         "réduit la vidéo",
         "réduis la vidéo",
     ],
+    "slow_down": [
+        "ralentir",
+        "ralentis",
+        "ralenti",
+        "ralentir la vidéo",
+        "ralentis la vidéo",
+    ],
 }
 
 # Mapping from semantic intents to actual commands

@@ -32,6 +32,13 @@ Commande vocale : action associée
 - "application démarrer enregistrement" : Démarrer l'enregistrement
 - "application arrêter enregistrement" : Arrêter l'enregistrement
 
+### Zoom 
+- "application agrandir" : zoom dans la vidéo d'un cran
+- "application réduire" : réinitialise le zoom initial
+
+### Ralentir 
+- "application ralentir" : ralenti la vidéo
+
 ### Tags
 - "application ajouter un tag" :  un tag à la position actuelle
 - "application aller au tag [numéro]" : N au tag spécifié (ex: "application aller au tag cinq")

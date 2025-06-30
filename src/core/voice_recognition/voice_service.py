@@ -145,6 +145,7 @@ class VoiceService(QObject):
             "zoom": lambda: events.cycle_zoom_Signal.emit(),
             "zoom_in": lambda: events.zoom_in_Signal.emit(),
             "zoom_out": lambda: events.zoom_out_Signal.emit(),
+            "slow_down": lambda: events.slow_down_Signal.emit(),
         }
 
         # Add commands using canonical phrases
