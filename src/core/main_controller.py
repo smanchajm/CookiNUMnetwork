@@ -102,6 +102,9 @@ class MainController:
         events.load_last_video_clicked.connect(
             self.media_service.load_last_recorded_video
         )
+        events.review_mode_clicked.connect(
+            lambda: events.load_last_video_clicked.emit()
+        )
 
         # Tag connections
         events.add_tag_clicked.connect(self._on_add_tag_clicked)
