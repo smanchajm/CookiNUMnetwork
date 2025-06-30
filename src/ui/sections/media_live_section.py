@@ -1,7 +1,6 @@
 import time
 
-from PySide6.QtCore import Qt, QUrl
-from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QFrame, QLabel
 
 from src.core.logging_config import logger
@@ -31,25 +30,11 @@ class MediaLiveSection(QFrame):
             "--no-skip-frames",
         ]
 
-        # audio player
-        self.audio_player = QMediaPlayer()
-        self.audio_output = QAudioOutput()
-        self.audio_player.setAudioOutput(self.audio_output)
-
         self.setup_ui()
 
     def setup_ui(self):
         self.video_frame = QFrame()
         self.video_frame.setObjectName("video_frame")
-
-        # Add recording indicator overlay
-        self.recording_indicator = QLabel("Enregistrement", self.video_frame)
-        self.recording_indicator.setObjectName("recording_indicator")
-        self.recording_indicator.setVisible(False)
-        self.recording_indicator.setAlignment(
-            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
-        )
-        self.recording_indicator.raise_()
 
         # Add instructions label for RTMP connection
         self.instructions_label = QLabel(self.video_frame)
@@ -96,16 +81,6 @@ class MediaLiveSection(QFrame):
     def _update_display(self):
         """Update display based on connection state."""
         self.instructions_label.setVisible(not self.is_rtmp_connected)
-
-    def on_recording_state_changed(self, is_recording: bool = False):
-        """Show or hide the recording indicator overlay and play sound."""
-        self.recording_indicator.setVisible(is_recording)
-        self.recording_indicator.raise_()
-
-        # Play recording start sound
-        sound_path = ResourceManager.get_sound_path("recording_sound.wav")
-        self.audio_player.setSource(QUrl.fromLocalFile(str(sound_path)))
-        self.audio_player.play()
 
     def resizeEvent(self, event):
         """Resize video widget when window is resized."""

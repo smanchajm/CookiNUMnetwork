@@ -1,5 +1,6 @@
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
+from PySide6.QtCore import Qt, QUrl
+from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
+from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget, QLabel
 from PySide6.QtSvgWidgets import QSvgWidget
 
 from src.utils.resource_manager import ResourceManager
@@ -16,6 +17,11 @@ class LogoSection(QWidget):
         super().__init__(parent)
         self.setObjectName("logo_section")
 
+        # audio player for recording sound
+        self.audio_player = QMediaPlayer()
+        self.audio_output = QAudioOutput()
+        self.audio_player.setAudioOutput(self.audio_output)
+
         self._setup_ui()
         self._load_svg(logo_path)
 
@@ -24,12 +30,21 @@ class LogoSection(QWidget):
         self.svg_widget = QSvgWidget()
         self.svg_widget.setObjectName("logo_svg")
 
+        # Add recording indicator below the logo
+        self.recording_indicator = QLabel("Enregistrement")
+        self.recording_indicator.setObjectName("recording_indicator")
+        self.recording_indicator.setVisible(False)
+        self.recording_indicator.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
         # Create a container widget for centering
         container = QWidget()
-        container_layout = QHBoxLayout(container)
+        container_layout = QVBoxLayout(container)
         container_layout.setContentsMargins(0, 0, 0, 0)
         container_layout.addWidget(
             self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter
+        )
+        container_layout.addWidget(
+            self.recording_indicator, alignment=Qt.AlignmentFlag.AlignCenter
         )
 
         self.layout = QVBoxLayout(self)
@@ -63,6 +78,15 @@ class LogoSection(QWidget):
                 # Update the SVG widget size
                 self.svg_widget.setFixedSize(new_width, new_height)
                 self.svg_widget.updateGeometry()
+
+    def on_recording_state_changed(self, is_recording: bool = False):
+        """Show or hide the recording indicator overlay and play sound."""
+        self.recording_indicator.setVisible(is_recording)
+
+        # Play recording start sound
+        sound_path = ResourceManager.get_sound_path("recording_sound.wav")
+        self.audio_player.setSource(QUrl.fromLocalFile(str(sound_path)))
+        self.audio_player.play()
 
     def resizeEvent(self, event):
         """Handle the section's own resize events."""

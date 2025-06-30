@@ -154,13 +154,13 @@ class MainController:
             self.main_window.sidebar.action_section.update_recording_state
         )
         events.recording_state_changed.connect(
-            self.main_window.media_player.live_section.on_recording_state_changed
+            self.main_window.sidebar.logo_section.on_recording_state_changed
         )
         # Update video path when recording starts/stops
         events.recording_state_changed.connect(self._on_recording_state_changed)
 
         events.voice_command_recognized.connect(
-            self.main_window.media_player.live_section.on_recording_state_changed
+            self.main_window.sidebar.logo_section.on_recording_state_changed
         )
 
         # Tag connections
